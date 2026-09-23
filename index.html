@@ -78,7 +78,7 @@
     padding: 22px;
     box-shadow: 0 1px 0 rgba(255,255,255,0.04) inset, 0 12px 28px rgba(0,0,0,0.4);
     border: px solid white;
-    width: 350px;
+    width: 450px;
     height: 300px;
     display: flex;
 flex-direction: column;
@@ -87,11 +87,19 @@ align-items: center;
   
 
   canvas {
-    display: block;
-    border-radius: 100%;
-    background: var(--screen-bg);
-    cursor: pointer;
-  }
+
+display: block;
+
+width: 300px;
+height: 300px;
+
+border-radius: 30%;
+
+background: var(--screen-bg);
+
+cursor: pointer;
+
+}
 
   .device-buttons {
     display: flex;
@@ -1003,7 +1011,7 @@ let poopAfterMs = 30 * 60000;
 let poops = []; // {x, y, seed} for each currently-visible poop
 let nextPoopSpawnAt = null; // a real Date.now()-based timestamp, not a t-based one
 let poopCountMax = 15;
-let poopSpawnIntervalMs = 30 * 60000;
+let poopSpawnIntervalMs = 5 * 1000;
 let happyUntil = null;
 const HAPPY_DURATION_MS = 2000;
 
@@ -1150,6 +1158,7 @@ function restoreCreatureIfSaved() {
   if (nextPoopSpawnAt !== null) {
     while (Date.now() >= nextPoopSpawnAt && poops.length < poopCountMax) {
       poops.push(randomPoopPosition());
+    
       nextPoopSpawnAt += poopSpawnIntervalMs;
     }
     if (poops.length >= poopCountMax) nextPoopSpawnAt = null;
@@ -2191,9 +2200,10 @@ function drawActionMenu() {
 
   const rowH = 36;
   const startY = 34;
+  const menuScroll = actionMenuIndex;
 
   ACTION_MENU.forEach((item, i) => {
-    const y = startY + i * rowH;
+    const y = startY + (i - menuScroll) * rowH;
     const selected = i === actionMenuIndex;
 
     if (selected) {
@@ -2223,6 +2233,136 @@ function drawActionMenu() {
   ctx.font = "8px 'Space Mono', monospace";
   ctx.fillText('A SELECT   B DOWN   A HOLD BACK', W / 2, H - 5);
 }
+function drawStatsScreen(t) {
+
+if (creatureBornAt !== null) {
+
+  creatureAgeDays = Math.floor(
+    (Date.now() - creatureBornAt) / (24 * 60 * 60 * 1000)
+  );
+
+}
+
+ctx.fillStyle = '#111';
+
+ctx.fillRect(0, 0, W, H);
+
+ctx.save();
+ctx.translate(0, -statsScroll * 45);
+
+ctx.fillStyle = '#d7cfbe';
+ctx.font = "12px 'Space Mono', monospace";
+ctx.textAlign = 'left';
+ctx.textBaseline = 'middle';
+
+ctx.fillText('STATS', 18, 30);
+
+ctx.fillText('HAPPINESS', 24, 60);
+
+ctx.fillText(Math.round(happiness) + '%', W - 55, 60);
+
+ctx.fillText('FULLNESS', 24, 105);
+
+ctx.fillText('ENERGY', 24, 150);
+
+ctx.fillText('AGE', 24, 195);
+
+ctx.fillText(creatureAgeDays + ' DAYS', W - 75, 195);
+
+ctx.fillText(Math.round(energy) + '%', W - 55, 150);
+
+ctx.fillText(Math.round(hunger) + '%', W - 55, 105);
+
+
+// Happiness bar
+const barX = 24;
+const barY = 72;
+const barW = W - 48;
+const barH = 10;
+
+ctx.strokeStyle = '#d7cfbe';
+ctx.strokeRect(barX, barY, barW, barH);
+
+ctx.fillStyle = '#d7cfbe';
+ctx.fillRect(
+  barX,
+  barY,
+  barW * (happiness / 100),
+  barH
+);
+// Fullness bar
+
+const fullnessBarY = 117;
+
+ctx.strokeStyle = '#d7cfbe';
+
+ctx.strokeRect(barX, fullnessBarY, barW, barH);
+
+ctx.fillStyle = '#d7cfbe';
+
+ctx.fillRect(
+
+  barX,
+
+  fullnessBarY,
+
+  barW * (hunger / 100),
+
+  barH
+
+);
+
+// Energy bar
+
+const energyBarY = 162;
+
+ctx.strokeStyle = '#d7cfbe';
+
+ctx.strokeRect(barX, energyBarY, barW, barH);
+
+ctx.fillStyle = '#d7cfbe';
+
+ctx.fillRect(
+
+  barX,
+
+  energyBarY,
+
+  barW * (energy / 100),
+
+  barH
+
+);
+
+ctx.restore();
+
+}
+
+function drawBirthChartScreen() {
+
+ctx.fillStyle = '#111';
+ctx.fillRect(0, 0, W, H);
+
+ctx.fillStyle = '#d7cfbe';
+ctx.font = "12px 'Space Mono', monospace";
+ctx.textAlign = 'left';
+ctx.textBaseline = 'middle';
+
+ctx.fillText('BIRTH CHART', 18, 30);
+
+ctx.font = "11px 'Space Mono', monospace";
+
+ctx.fillText('SUN', 18, 75);
+ctx.fillText('PISCES ♓', 90, 75);
+
+ctx.fillText('MOON', 18, 115);
+ctx.fillText('SCORPIO ♏', 90, 115);
+
+ctx.fillText('ASCENDANT', 18, 155);
+ctx.fillText('ARIES ♈', 90, 155);
+
+}
+
 
 function drawCreatureScreen(t) {
   if (lastInteractionAt === null) lastInteractionAt = t; // starts the idle clock fresh whenever the creature (re)appears
@@ -2274,7 +2414,10 @@ function drawCreatureScreen(t) {
   // and reopened later - see the save/restore section further down.
   if (happyUntil === null && healUntil === null && nextPoopSpawnAt !== null && Date.now() >= nextPoopSpawnAt && poops.length < poopCountMax) {
     poops.push(randomPoopPosition());
-    cleanBtn.style.display = 'inline-block';
+
+happiness = Math.max(0, happiness - 3);
+
+cleanBtn.style.display = 'inline-block';
     nextPoopSpawnAt = poops.length < poopCountMax ? Date.now() + poopSpawnIntervalMs : null;
     saveCreatureState();
   }
@@ -2284,6 +2427,7 @@ function drawCreatureScreen(t) {
   // every frame once already sick.
   if (!isSick && poops.length >= sickThreshold) {
     isSick = true;
+    happiness = 0;
     sickStartedAt = Date.now();
     healBtn.style.display = 'inline-block';
     // Sick phase list is shorter (idle only) - reset so phaseIndex can't
@@ -2393,6 +2537,26 @@ function drawCreatureScreen(t) {
   ctx.scale(1, breathe * squashY);
   drawCreatureBody(blinkAmount);
   ctx.restore();
+
+if (hunger <= 40) {
+
+  ctx.fillStyle = '#d7cfbe';
+
+  ctx.beginPath();
+  ctx.arc(centerX + 55, baseY + bounceOffset - 70, 22, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.fillStyle = '#1c1b19';
+
+  ctx.font = "16px sans-serif";
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+
+  ctx.fillText('🍗', centerX + 55, baseY + bounceOffset - 70);
+
+}
+
+poops.forEach(p => drawPoop(t, p.x, p.y, p.seed));
 
   poops.forEach(p => drawPoop(t, p.x, p.y, p.seed));
 
@@ -2681,8 +2845,13 @@ function selectActionMenuItem() {
     cleanBtn.click();
   } else if (selected.action === 'heal') {
     healBtn.click();
+  } else if (selected.action === 'stats') {
+    statsScreenOpen = true;
+  } else if (selected.action === 'birthChart') {
+    birthChartScreenOpen = true;
   }
-}
+
+  }
 
 function handleButtonA() {
   lastInteractionAt = lastT;
@@ -2696,6 +2865,15 @@ function handleButtonA() {
     selectActionMenuItem();
     return;
   }
+
+  if (statsScreenOpen || birthChartScreenOpen) {
+  statsScreenOpen = false;
+  birthChartScreenOpen = false;
+  actionMenuOpen = true;
+  actionMenuIndex = 0;
+  actionMenuOpenedAt = lastT;
+  return;
+}
 
   if (appState === 'creature') {
     actionMenuOpen = true;
@@ -2760,7 +2938,15 @@ function handleButtonB() {
     return;
   }
 
-  if (!actionMenuOpen) return;
+  if (statsScreenOpen) {
+
+    statsScroll = (statsScroll + 1) % 5;
+
+return;
+
+}
+
+if (!actionMenuOpen) return;
 
   actionMenuIndex = (actionMenuIndex + 1) % ACTION_MENU.length;
   actionMenuOpenedAt = lastT;
@@ -2817,6 +3003,15 @@ let appState = 'poweroff';
 // Long-press A = Back / close menu
 let actionMenuOpen = false;
 let actionMenuIndex = 0;
+
+let hunger = 100;
+let happiness = 50;
+let energy = 100;
+let creatureAgeDays = 0;
+let statsScroll = 0;
+let statsScreenOpen = false;
+let birthChartScreenOpen = false;
+
 let actionMenuOpenedAt = 0;
 const ACTION_MENU_TIMEOUT_MS = 10000;
 const ACTION_MENU = [
@@ -2824,12 +3019,23 @@ const ACTION_MENU = [
   { label: 'BREATHE', action: 'breathe' },
   { label: 'CLEAN', action: 'clean' },
   { label: 'HEAL', action: 'heal' },
-  { label: 'CANCEL', action: 'cancel' }
+  { label: 'STATS', action: 'stats' },
+  { label: 'CANCEL', action: 'cancel' },
+  { label: 'BIRTH CHART', action: 'birthChart' }
 ];
 
 let fallStartTime = null;
 let fallDurationMs = 4000;
 let eggFadeDurationMs = 800;
+// Hunger system
+const HUNGER_INTERVAL_MS = 10 * 1000; // 10 seconds
+const HAPPINESS_INTERVAL_MS = 999999999;
+const ENERGY_INTERVAL_MS = 60 * 1000;
+let lastHungerUpdate = null;
+let lastHappinessUpdate = null;
+let lastEnergyUpdate = null;
+let starvationStartedAt = null;
+const STARVATION_SICKNESS_MS = 2 * 60 * 1000; // 2 minutes
 let cloudSpeedMult = 1, cloudSizeMult = 1, cloudSpreadMult = 1, cloudHeightOffset = 0;
 let promptBlinkMs = 500;
 
@@ -2938,7 +3144,7 @@ function jumpTo(target) {
   creatureEnterTime = null; nextBlinkAt = null; blinkStartAt = null;
   birthPromptOverlayDrawn = false; namingOverlayDrawn = false; poops = []; nextPoopSpawnAt = null;
   creatureNameInput.style.display = 'none'; confirmNameBtn.style.display = 'none';
-  happyUntil = null; isSick = false; sickStartedAt = null; healUntil = null;
+  happyUntil = null; isSick = false; sickStartedAt = null; starvationStartedAt = null; healUntil = null;
   breathingStartTime = null; feedingStartTime = null;
   healBtn.style.display = 'none'; healBtn.disabled = false;
   cleanBtn.style.display = 'none';
@@ -3019,6 +3225,7 @@ function jumpTo(target) {
       poops = Array.from({ length: sickThreshold }, () => randomPoopPosition());
       nextPoopSpawnAt = null; // already past the cap, so no new spawns until healed
       isSick = true;
+      happiness = 0;
       sickStartedAt = Date.now();
       pauseBtn.style.display = 'none';
       breatheBtn.style.display = 'inline-block';
@@ -3119,27 +3326,50 @@ cleanBtn.addEventListener('click', () => {
 });
 
 breatheBtn.addEventListener('click', () => {
-  if (appState !== 'creature') return;
-  lastInteractionAt = lastT;
-  appState = 'breathing';
-  breathingStartTime = lastT;
-  breatheBtn.disabled = true;
+
+if (appState !== 'creature') return;
+
+lastInteractionAt = lastT;
+
+happiness = Math.min(100, happiness + 8);
+
+appState = 'breathing';
+
+breathingStartTime = lastT;
+
+breatheBtn.disabled = true;
+
 });
 
 feedBtn.addEventListener('click', () => {
-  if (appState !== 'creature') return;
-  lastInteractionAt = lastT;
-  appState = 'feeding';
-  feedingStartTime = lastT;
-  feedBtn.disabled = true;
+
+if (appState !== 'creature') return;
+
+lastInteractionAt = lastT;
+
+hunger = Math.min(100, hunger + 20);
+
+happiness = Math.min(100, happiness + 5);
+
+appState = 'feeding';
+
+feedingStartTime = lastT;
+
+feedBtn.disabled = true;
+
 });
 
 healBtn.addEventListener('click', () => {
   if (!isSick) return;
   lastInteractionAt = lastT;
+  happiness = Math.min(100, happiness + 10);
   isSick = false;
-  sickStartedAt = null;
-  poops = []; // healing also clears the pile, so sickness doesn't instantly re-trigger
+
+sickStartedAt = null;
+
+starvationStartedAt = null;
+
+poops = []; // healing also clears the pile, so sickness doesn't instantly re-trigger
   cleanBtn.style.display = 'none';
   healBtn.style.display = 'none';
   nextPoopSpawnAt = Date.now() + poopAfterMs;
@@ -3188,10 +3418,86 @@ function sickCreaturePhases() {
 
 function easeInCubic(t) { return t * t * t; }
 function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
+// ================================
+// HUNGER UPDATE
+// ================================
+function updateHunger(t) {
+
+if (lastHungerUpdate === null) {
+
+  lastHungerUpdate = t;
+
+  return;
+
+}
+
+if (t - lastHungerUpdate >= HUNGER_INTERVAL_MS) {
+
+  hunger = Math.max(0, hunger - 10);
+
+  lastHungerUpdate = t;
+
+}
+
+if (lastHappinessUpdate === null) {
+
+lastHappinessUpdate = t;
+
+} else if (false) {
+
+  happiness = Math.max(0, happiness - 5);
+
+  lastHappinessUpdate = t;
+
+}
+if (lastEnergyUpdate === null) {
+
+lastEnergyUpdate = t;
+
+} else if (t - lastEnergyUpdate >= ENERGY_INTERVAL_MS) {
+
+energy = Math.max(0, energy - 5);
+
+lastEnergyUpdate = t;
+
+}
+
+}
+
+if (hunger <= 0 && !isSick) {
+
+  if (starvationStartedAt === null) {
+
+    starvationStartedAt = Date.now();
+
+  }
+
+  if (Date.now() - starvationStartedAt >= STARVATION_SICKNESS_MS) {
+
+    isSick = true;
+
+    sickStartedAt = Date.now();
+
+    healBtn.style.display = 'inline-block';
+
+    phaseIndex = 0;
+
+    phaseStartTime = t;
+
+    saveCreatureState();
+
+  }
+
+} else if (hunger > 0) {
+
+  starvationStartedAt = null;
+
+}
+
 
 function drawFrame(t) {
   lastT = t;
-
+  updateHunger(t);
   if (appState === 'poweroff') {
     ctx.fillStyle = '#111';
     ctx.fillRect(0, 0, W, H);
@@ -3236,10 +3542,26 @@ function drawFrame(t) {
   }
 
   if (appState === 'creature') {
-    drawCreatureScreen(t);
-    requestAnimationFrame(drawFrame);
-    return;
-  }
+
+    if (statsScreenOpen) {
+
+drawStatsScreen(t);
+
+} else if (birthChartScreenOpen) {
+
+drawBirthChartScreen();
+
+} else {
+
+drawCreatureScreen(t);
+
+}
+
+requestAnimationFrame(drawFrame);
+
+return;
+
+}
 
   if (appState === 'screensaver') {
     drawScreensaverScreen(t);
