@@ -1,0 +1,4010 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8">
+<title>ghoͥsⷫt ͭ ͪ ͤshell </title>
+<link rel="icon" type="image/png" href="icon.png">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Manrope:wght@400;600;700&display=swap');
+
+  :root {
+    --shell: #1c1b19;
+    --shell-2: #262421;
+    --screen-bg: #eee7d8;
+    --egg-fallback: #2f2b26;
+    --accent: #c98a2c;
+    --accent-2: #5b7a63;
+    --text-primary: #f2ede2;
+    --text-secondary: #a89f8f;
+    --border-soft: #3a3733;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: #000000;
+    color: var(--text-primary);
+    font-family: 'Manrope', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 32px 20px;
+  }
+
+  .lab {
+    display: flex;
+    gap: 40px;
+    max-width: 920px;
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .device-column {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    flex: 0 0 340px;
+    position: sticky;
+    top: 12px;
+    align-self: flex-start;
+    background: var(--shell);
+    z-index: 10;
+    padding-bottom: 8px;
+  }
+
+  h1 {
+    font-family: 'Manrope', sans-serif;
+    font-weight: 700;
+    font-size: 20px;
+    margin: 0 0 4px 0;
+    letter-spacing: -0.01em;
+  }
+
+  .subtitle {
+    color: var(--text-secondary);
+    font-size: 13px;
+    margin: 0 0 8px 0;
+    line-height: 1.5;
+    max-width: 300px;
+    text-align: center;
+  }
+
+  .device-shell {
+    background: #fffdef;
+    border-radius: 150px;
+    padding: 22px;
+    box-shadow: 0 1px 0 rgba(255,255,255,0.04) inset, 0 12px 28px rgba(0,0,0,0.4);
+    border: px solid white;
+    width: 450px;
+    height: 300px;
+    display: flex;
+flex-direction: column;
+align-items: center;
+  }
+  
+
+  canvas {
+
+display: block;
+
+width: 300px;
+height: 300px;
+
+border-radius: 30%;
+
+background: var(--screen-bg);
+
+cursor: pointer;
+
+}
+
+  .device-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin-top: 10px;
+  }
+
+  .device-buttons span {
+    width: 50px;
+    height: 50px;
+    border-radius: 30px;
+    background: #ff8e8e;
+    border: 0px solid white;
+  }
+  #deviceButtonA {
+
+background: rgb(197, 255, 174);
+
+}
+
+#deviceButtonB {
+
+background: rgb(127, 255, 246);
+
+}
+  
+
+  .hint {
+    font-size: 12px;
+    color: var(--text-secondary);
+    text-align: center;
+  }
+
+  .phase-readout {
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    color: var(--accent);
+    text-align: center;
+    min-height: 16px;
+  }
+
+  /* Beta / presentation mode */
+  body.presentation-mode {
+    padding: 0;
+    overflow: hidden;
+    align-items: center;
+  }
+
+  body.presentation-mode .lab {
+    width: 100vw;
+    max-width: none;
+    min-height: 100vh;
+    align-items: center;
+    justify-content: center;
+  }
+
+  body.presentation-mode .controls {
+    display: none !important;
+  }
+
+  body.presentation-mode .device-column {
+    position: static;
+    flex: 0 0 auto;
+    padding: 0;
+    background: transparent;
+    gap: 10px;
+  }
+
+  body.presentation-mode .device-column > div:first-child,
+  body.presentation-mode .device-column > .phase-readout,
+  body.presentation-mode .device-column > .btn,
+  body.presentation-mode .device-column > input,
+  body.presentation-mode .device-column > .hint {
+    display: none !important;
+  }
+
+  body.presentation-mode {
+    min-height: 100svh;
+    height: 100svh;
+    width: 100vw;
+    padding: 0;
+    margin: 0;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+  }
+
+  body.presentation-mode .lab {
+    width: 100vw;
+    height: 100svh;
+    min-height: 100svh;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+  }
+
+  body.presentation-mode .device-column {
+    width: max-content;
+    max-width: none;
+    flex: 0 0 auto;
+    position: static;
+    margin: 0;
+    padding: 0;
+    gap: 0;
+  }
+
+  body.presentation-mode .device-shell {
+    transform: translate(0px,200px) scale(var(--presentation-scale, 1));
+    transform-origin: center center;
+}
+
+  .dev-toggle {
+    position: fixed;
+    top: 12px;
+    right: 12px;
+    z-index: 1000;
+    font-size: 9px;
+    padding: 6px 9px;
+    opacity: 0.65;
+  }
+
+  body.presentation-mode .dev-toggle {
+    opacity: 0.18;
+  }
+
+  body.presentation-mode .dev-toggle:hover {
+    opacity: 1;
+  }
+
+  @media (max-width: 520px) {
+    body.presentation-mode .device-shell {
+      transform: scale(1.05);
+    }
+  }
+
+  .controls {
+    flex: 1 1 400px;
+    min-width: 280px;
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+  }
+
+  .group {
+    background: var(--shell-2);
+    border: 1px solid var(--border-soft);
+    border-radius: 10px;
+    padding: 16px 18px;
+  }
+
+  .group-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--accent);
+    margin: 0 0 12px 0;
+    letter-spacing: 0.01em;
+  }
+
+  .row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+  }
+
+  .row:last-child { margin-bottom: 0; }
+
+  .row label {
+    flex: 0 0 118px;
+    font-size: 13px;
+    color: var(--text-primary);
+  }
+
+  .row input[type=range] {
+    flex: 1;
+    -webkit-appearance: none;
+    height: 4px;
+    border-radius: 2px;
+    background: var(--border-soft);
+    outline: none;
+  }
+
+  .row input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--accent);
+    cursor: pointer;
+    border: none;
+  }
+
+  .row input[type=range]::-moz-range-thumb {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--accent);
+    cursor: pointer;
+    border: none;
+  }
+
+  .row input[type=color] {
+    flex: 1;
+    height: 28px;
+    border: 1px solid var(--border-soft);
+    border-radius: 6px;
+    padding: 2px;
+    background: var(--shell);
+    cursor: pointer;
+  }
+
+  .row input[type=text] {
+    flex: 1;
+    height: 28px;
+    border: 1px solid var(--border-soft);
+    border-radius: 6px;
+    padding: 0 8px;
+    background: #141312;
+    color: var(--text-primary);
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+  }
+
+  .row .value {
+    flex: 0 0 56px;
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    color: var(--text-secondary);
+    text-align: right;
+  }
+
+  .art-buttons {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .btn {
+    font-family: 'Manrope', sans-serif;
+    font-weight: 600;
+    font-size: 13px;
+    padding: 9px 14px;
+    border-radius: 7px;
+    border: 1px solid var(--border-soft);
+    background: #302d29;
+    color: var(--text-primary);
+    cursor: pointer;
+  }
+
+  .btn:hover { border-color: var(--accent); }
+
+  .device-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 28px;
+    border: 1px solid var(--border-soft);
+    border-radius: 50%;
+    background: #302d29;
+    color: var(--text-primary);
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    cursor: pointer;
+    user-select: none;
+    touch-action: manipulation;
+  }
+
+  .device-button:hover {
+    border-color: var(--accent);
+    transform: translateY(-1px);
+  }
+
+  .device-button:active {
+    transform: translateY(1px);
+  }
+
+  .btn.primary {
+    background: var(--accent);
+    color: #1c1b19;
+    border-color: var(--accent);
+  }
+
+  .btn.primary:hover { filter: brightness(1.08); }
+
+  input[type=file] { display: none; }
+
+  .code-box {
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    line-height: 1.7;
+    background: #141312;
+    border-radius: 8px;
+    padding: 12px 14px;
+    color: #d7cfbe;
+    white-space: pre;
+    overflow-x: auto;
+    border: 1px solid var(--border-soft);
+  }
+
+  .code-box .kw { color: var(--accent-2); }
+  .code-box .num { color: var(--accent); }
+
+  .copy-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+
+  .copied-msg {
+    font-size: 12px;
+    color: var(--accent-2);
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+
+  .copied-msg.show { opacity: 1; }
+</style>
+</head>
+<body class="" style="--presentation-scale: 1.450;">
+
+<button class="btn dev-toggle" id="devToggleBtn" title="Hide developer tools">HIDE DEV</button>
+
+<div class="lab">
+  <div class="device-column">
+    <div>
+      <h1>Egg Animation Lab</h1>
+      <p class="subtitle">Floating cells divide and merge. Tune their timing and appearance below.</p>
+    </div>
+    <div class="device-shell" style="">
+      <canvas id="screen" width="280" height="200"></canvas>
+      <div class="device-buttons">
+        <span id="deviceButtonA" class="device-button" title="Action / Select">X</span>
+        <span id="deviceButtonB" class="device-button" title="Navigate down">Y</span>
+      </div>
+    </div>
+    <p class="phase-readout" id="phaseReadout"></p>
+    <button class="btn primary" id="pauseBtn" style="margin-top: 4px; display: none;">Press Button</button>
+    <button class="btn" id="rebootBtn">Resurrect</button>
+    <button class="btn" id="cleanBtn" style="display: inline-block;">Clean</button>
+    <button class="btn" id="breatheBtn" style="display: inline-block;">Take a breath</button>
+    <button class="btn" id="feedBtn" style="display: inline-block;">Feed</button>
+    <button class="btn" id="healBtn" style="display: none;">Heal</button>
+    <button class="btn primary" id="wakeBtn" style="display: none;">Wake up</button>
+    <input type="text" id="creatureNameInput" placeholder="name your creature" style="display:none; width:100%; height:34px; border:1px solid var(--border-soft); border-radius:7px; padding:0 10px; background:#141312; color:var(--text-primary); font-family:'Manrope', sans-serif; font-size:14px; box-sizing:border-box;" value="cookie">
+    <button class="btn primary" id="confirmNameBtn" style="display:none;">Confirm name</button>
+    <button class="btn" id="resetSettingsBtn" style="font-size:11px; padding:6px 10px; opacity:0.7;">Reset all settings</button>
+    <p class="hint">A = Action / Select &nbsp; B = Down &nbsp; Hold A = Back</p>
+  </div>
+
+  <div class="controls">
+
+    <div class="group">
+      <p class="group-title">Jump to screen (skip the wait)</p>
+      <div class="art-buttons">
+        <button class="btn" data-jump="poweroff">Power off</button>
+        <button class="btn" data-jump="boot">Boot</button>
+        <button class="btn" data-jump="falling">Falling</button>
+        <button class="btn" data-jump="loop">Egg loop</button>
+        <button class="btn" data-jump="birthPrompt">Ready to exist</button>
+        <button class="btn" data-jump="hatching">Hatching</button>
+        <button class="btn" data-jump="creature">Creature</button>
+        <button class="btn" data-jump="breathing">Breathing</button>
+        <button class="btn" data-jump="feeding">Feeding</button>
+        <button class="btn" data-jump="sick">Sick</button>
+        <button class="btn" data-jump="dead">Dead</button>
+      </div>
+    </div>
+
+<div class="group" id="actionVisualControls">
+<div class="row"><label for="menuAutoClose">Auto-close after (0 = off)</label><input type="range" id="menuAutoClose" min="0" max="600" step="1" value="0"><span class="value" id="menuAutoCloseVal" tabindex="0" role="button" title="Click to type an exact value" style="cursor: text;">Off</span></div>
+<p class="group-title">Action menu — visual controls</p><p style="font-size:11px">Open the action menu to preview. Click numeric values to type. Alignment: left / center / right.</p>
+<div class="row"><label for="menuX">Horizontal offset</label><input type="range" id="menuX" min="-60" max="60" step="1" value="25"><span class="value" id="menuXVal" tabindex="0" role="button" title="Click to type an exact value" style="cursor: text;">25px</span></div>
+<div class="row"><label for="menuY">Vertical offset</label><input type="range" id="menuY" min="-30" max="30" step="1" value="-6"><span class="value" id="menuYVal" tabindex="0" role="button" title="Click to type an exact value" style="cursor: text;">-6px</span></div>
+<div class="row"><label for="menuPadding">Side padding</label><input type="range" id="menuPadding" min="0" max="60" step="1" value="9"><span class="value" id="menuPaddingVal" tabindex="0" role="button" title="Click to type an exact value" style="cursor: text;">9px</span></div>
+<div class="row"><label for="menuTextInset">Text inset</label><input type="range" id="menuTextInset" min="0" max="25" step="1" value="8"><span class="value" id="menuTextInsetVal" tabindex="0" role="button" title="Click to type an exact value" style="cursor: text;">8px</span></div>
+<div class="row"><label for="menuRowSpacing">Row spacing</label><input type="range" id="menuRowSpacing" min="20" max="60" step="1" value="36"><span class="value" id="menuRowSpacingVal" tabindex="0" role="button" title="Click to type an exact value" style="cursor: text;">36px</span></div>
+<div class="row"><label for="menuRowHeight">Selection height</label><input type="range" id="menuRowHeight" min="16" max="55" step="1" value="28"><span class="value" id="menuRowHeightVal" tabindex="0" role="button" title="Click to type an exact value" style="cursor: text;">28px</span></div>
+<div class="row"><label for="menuRowsY">List position</label><input type="range" id="menuRowsY" min="28" max="90" step="1" value="34"><span class="value" id="menuRowsYVal" tabindex="0" role="button" title="Click to type an exact value" style="cursor: text;">34px</span></div>
+<div class="row"><label for="menuTitleY">Title position</label><input type="range" id="menuTitleY" min="8" max="40" step="1" value="14"><span class="value" id="menuTitleYVal" tabindex="0" role="button" title="Click to type an exact value" style="cursor: text;">14px</span></div>
+<div class="row"><label for="menuFooterY">Footer position</label><input type="range" id="menuFooterY" min="160" max="198" step="1" value="195"><span class="value" id="menuFooterYVal" tabindex="0" role="button" title="Click to type an exact value" style="cursor: text;">195px</span></div>
+<div class="row"><label for="menuTitleSize">Title size</label><input type="range" id="menuTitleSize" min="8" max="22" step="1" value="9"><span class="value" id="menuTitleSizeVal" tabindex="0" role="button" title="Click to type an exact value" style="cursor: text;">9px</span></div>
+<div class="row"><label for="menuLabelSize">Label size</label><input type="range" id="menuLabelSize" min="8" max="22" step="1" value="11"><span class="value" id="menuLabelSizeVal" tabindex="0" role="button" title="Click to type an exact value" style="cursor: text;">11px</span></div>
+<div class="row"><label for="menuFooterSize">Footer size</label><input type="range" id="menuFooterSize" min="6" max="14" step="1" value="8"><span class="value" id="menuFooterSizeVal" tabindex="0" role="button" title="Click to type an exact value" style="cursor: text;">8px</span></div>
+<div class="row"><label for="menuTitleAlign">Title alignment</label><input type="range" id="menuTitleAlign" min="0" max="2" step="1" value="0"><span class="value" id="menuTitleAlignVal" tabindex="0" role="button" title="Click to type an exact value" style="cursor: text;">left</span></div>
+<div class="row"><label for="menuLabelAlign">Label alignment</label><input type="range" id="menuLabelAlign" min="0" max="2" step="1" value="0"><span class="value" id="menuLabelAlignVal" tabindex="0" role="button" title="Click to type an exact value" style="cursor: text;">left</span></div>
+<div class="row"><label for="menuFooterAlign">Footer alignment</label><input type="range" id="menuFooterAlign" min="0" max="2" step="1" value="0"><span class="value" id="menuFooterAlignVal" tabindex="0" role="button" title="Click to type an exact value" style="cursor: text;">left</span></div>
+<div class="row"><label for="menuOpacity">Background opacity</label><input type="range" id="menuOpacity" min="0" max="100" step="1" value="75"><span class="value" id="menuOpacityVal" tabindex="0" role="button" title="Click to type an exact value" style="cursor: text;">75%</span></div>
+<div class="row"><label for="menuDisabledOpacity">Unavailable text opacity</label><input type="range" id="menuDisabledOpacity" min="0" max="100" step="1" value="35"><span class="value" id="menuDisabledOpacityVal" tabindex="0" role="button" title="Click to type an exact value" style="cursor: text;">35%</span></div>
+<div class="row"><label for="menuBackground">Background</label><input type="color" id="menuBackground" value="#242424"><span class="value" id="menuBackgroundVal">#242424</span></div>
+<div class="row"><label for="menuTitleColor">Title</label><input type="color" id="menuTitleColor" value="#8a8478"><span class="value" id="menuTitleColorVal">#8a8478</span></div>
+<div class="row"><label for="menuLabelColor">Labels</label><input type="color" id="menuLabelColor" value="#ffffff"><span class="value" id="menuLabelColorVal">#ffffff</span></div>
+<div class="row"><label for="menuSelectedBg">Selected row</label><input type="color" id="menuSelectedBg" value="#575551"><span class="value" id="menuSelectedBgVal">#575551</span></div>
+<div class="row"><label for="menuSelectedText">Selected text</label><input type="color" id="menuSelectedText" value="#33e0ff"><span class="value" id="menuSelectedTextVal">#33e0ff</span></div>
+<div class="row"><label for="menuFooterColor">Footer</label><input type="color" id="menuFooterColor" value="#8a8478"><span class="value" id="menuFooterColorVal">#8a8478</span></div>
+<div class="row"><label for="menuTitle">Screen title</label><input type="text" id="menuTitle" value=""></div>
+<div class="row"><label for="menuFooter">Footer</label><input type="text" id="menuFooter" value=""></div>
+<div class="row"><label for="menuMarker">Selection marker</label><input type="text" id="menuMarker" value="★"></div>
+<div class="row"><label for="menufeed">Feed label</label><input type="text" id="menufeed" value="FEED"></div>
+<div class="row"><label for="menubreathe">Breathe label</label><input type="text" id="menubreathe" value="BREATHE   ⨀"></div>
+<div class="row"><label for="menulava">Lava lamp label</label><input type="text" id="menulava" value="LAVA LAMP"></div>
+<div class="row"><label for="menudream">Dream label</label><input type="text" id="menudream" value="DREAM         ☽"></div>
+<div class="row"><label for="menuclean">Clean label</label><input type="text" id="menuclean" value="CLEAN  ✴︎"></div>
+<div class="row"><label for="menuheal">Heal label</label><input type="text" id="menuheal" value="HEAL ♡"></div>
+<div class="row"><label for="menustats">Stats label</label><input type="text" id="menustats" value="STATS"></div>
+<div class="row"><label for="menucancel">Cancel label</label><input type="text" id="menucancel" value="CANCEL"></div>
+<div class="row"><label for="menubirthChart">Birth chart label</label><input type="text" id="menubirthChart" value="BIRTH CHART"></div>
+</div>
+<div class="group" id="statsVisualControls">
+<p class="group-title">Stats screen — visual controls</p>
+<p style="font-size:11px">Open STATS from the device menu to preview changes. Alignment: left / center / right.</p>
+<div class="row"><label for="statsX">Horizontal offset</label><input type="range" id="statsX" min="-60" max="60" step="1" value="-1"><span class="value" id="statsXVal" tabindex="0" role="button" title="Click to type an exact value" style="cursor: text;">-1px</span></div>
+<div class="row"><label for="statsY">Vertical offset</label><input type="range" id="statsY" min="-30" max="30" step="1" value="13"><span class="value" id="statsYVal" tabindex="0" role="button" title="Click to type an exact value" style="cursor: text;">13px</span></div>
+<div class="row"><label for="statsPadding">Side padding</label><input type="range" id="statsPadding" min="8" max="48" step="1" value="32"><span class="value" id="statsPaddingVal" tabindex="0" role="button" title="Click to type an exact value" style="cursor: text;">32px</span></div>
+<div class="row"><label for="statsSpacing">Row spacing</label><input type="range" id="statsSpacing" min="32" max="65" step="1" value="48"><span class="value" id="statsSpacingVal" tabindex="0" role="button" title="Click to type an exact value" style="cursor: text;">48px</span></div>
+<div class="row"><label for="statsTitleY">Title position</label><input type="range" id="statsTitleY" min="10" max="42" step="1" value="24"><span class="value" id="statsTitleYVal" tabindex="0" role="button" title="Click to type an exact value" style="cursor: text;">24px</span></div>
+<div class="row"><label for="statsRowsY">List position</label><input type="range" id="statsRowsY" min="40" max="80" step="1" value="53"><span class="value" id="statsRowsYVal" tabindex="0" role="button" title="Click to type an exact value" style="cursor: text;">53px</span></div>
+<div class="row"><label for="statsLabelSize">Label size</label><input type="range" id="statsLabelSize" min="8" max="18" step="1" value="11"><span class="value" id="statsLabelSizeVal" tabindex="0" role="button" title="Click to type an exact value" style="cursor: text;">11px</span></div>
+<div class="row"><label for="statsValueSize">Value size</label><input type="range" id="statsValueSize" min="8" max="18" step="1" value="12"><span class="value" id="statsValueSizeVal" tabindex="0" role="button" title="Click to type an exact value" style="cursor: text;">12px</span></div>
+<div class="row"><label for="statsTitleSize">Title size</label><input type="range" id="statsTitleSize" min="8" max="22" step="1" value="13"><span class="value" id="statsTitleSizeVal" tabindex="0" role="button" title="Click to type an exact value" style="cursor: text;">13px</span></div>
+<div class="row"><label for="statsBarHeight">Bar height</label><input type="range" id="statsBarHeight" min="2" max="14" step="1" value="12"><span class="value" id="statsBarHeightVal" tabindex="0" role="button" title="Click to type an exact value" style="cursor: text;">12px</span></div>
+<div class="row"><label for="statsLabelAlign">Label alignment</label><input type="range" id="statsLabelAlign" min="0" max="2" step="1" value="0"><span class="value" id="statsLabelAlignVal" tabindex="0" role="button" title="Click to type an exact value" style="cursor: text;">left</span></div>
+<div class="row"><label for="statsValueAlign">Value alignment</label><input type="range" id="statsValueAlign" min="0" max="2" step="1" value="2"><span class="value" id="statsValueAlignVal" tabindex="0" role="button" title="Click to type an exact value" style="cursor: text;">right</span></div>
+<div class="row"><label for="statsTitleAlign">Title alignment</label><input type="range" id="statsTitleAlign" min="0" max="2" step="1" value="0"><span class="value" id="statsTitleAlignVal" tabindex="0" role="button" title="Click to type an exact value" style="cursor: text;">left</span></div>
+<div class="row"><label for="statsBackground">Background</label><input type="color" id="statsBackground" value="#ffffff"><span class="value" id="statsBackgroundVal">#ffffff</span></div>
+<div class="row"><label for="statsLabelColor">Labels</label><input type="color" id="statsLabelColor" value="#000000"><span class="value" id="statsLabelColorVal">#000000</span></div>
+<div class="row"><label for="statsValueColor">Values</label><input type="color" id="statsValueColor" value="#000000"><span class="value" id="statsValueColorVal">#000000</span></div>
+<div class="row"><label for="statsTitleColor">Title</label><input type="color" id="statsTitleColor" value="#000000"><span class="value" id="statsTitleColorVal">#000000</span></div>
+<div class="row"><label for="statsSelectedBg">Selected row</label><input type="color" id="statsSelectedBg" value="#ffffff"><span class="value" id="statsSelectedBgVal">#ffffff</span></div>
+<div class="row"><label for="statsSelectedText">Selected text</label><input type="color" id="statsSelectedText" value="#64ce92"><span class="value" id="statsSelectedTextVal">#64ce92</span></div>
+<div class="row"><label for="statsBarColor">Bars</label><input type="color" id="statsBarColor" value="#7f9f97"><span class="value" id="statsBarColorVal">#7f9f97</span></div>
+<div class="row"><label for="statsTitle">Screen title</label><input type="text" id="statsTitle" value="⠚★♡ ☯ ⁘ 𓃹 ⁖"></div>
+<div class="row"><label for="statsHappiness">Happiness label</label><input type="text" id="statsHappiness" value="HAPPINESS ♡"></div>
+<div class="row"><label for="statsFullness">Fullness label</label><input type="text" id="statsFullness" value="FULLNESS  •⩊•"></div>
+<div class="row"><label for="statsEnergy">Energy label</label><input type="text" id="statsEnergy" value="ENERGY  ☯"></div>
+<div class="row"><label for="statsAge">Age label</label><input type="text" id="statsAge" value="AGE"></div>
+<div class="row"><label for="statsFooter">Footer label</label><input type="text" id="statsFooter" value=""></div>
+</div>
+    <div class="group">
+      <p class="group-title">Rock phase</p>
+      <div class="row">
+        <label>Tilt amount</label>
+        <input type="range" id="tiltAmp" min="0" max="15" value="6" step="0.5">
+        <span class="value" id="tiltAmpVal" tabindex="0" role="button" title="Click to type an exact value" style="cursor: text;">6.0°</span>
+      </div>
+      <div class="row">
+        <label>Cycle speed</label>
+        <input type="range" id="tiltPeriod" min="300" max="2000" value="1130" step="10">
+        <span class="value" id="tiltPeriodVal" tabindex="0" role="button" title="Click to type an exact value" style="cursor: text;">1130ms</span>
+      </div>
+      <div class="row">
+        <label>Rock count</label>
+        <input type="range" id="rockRepeats" min="1" max="6" value="2" step="1">
+        <span class="value" id="rockRepeatsVal" tabindex="0" role="button" title="Click to type an exact value" style="cursor: text;">2x</span>
+      </div>
+    </div>
+
+    <div class="group">
+      <p class="group-title">Bounce phase</p>
+      <div class="row">
+        <label>Height</label>
+        <input type="range" id="bounceAmp" min="0" max="25" value="13" step="1">
+        <span class="value" id="bounceAmpVal" tabindex="0" role="button" title="Click to type an exact value" style="cursor: text;">13px</span>
+      </div>
+      <div class="row">
+        <label>Cycle speed</label>
+        <input type="range" id="bouncePeriod" min="300" max="1500" value="790" step="10">
+        <span class="value" id="bouncePeriodVal" tabindex="0" role="button" title="Click to type an exact value" style="cursor: text;">790ms</span>
+      </div>
+      <div class="row">
+        <label>Bounce count</label>
+        <input type="range" id="bounceRepeats" min="1" max="6" value="1" step="1">
+        <span class="value" id="bounceRepeatsVal" tabindex="0" role="button" title="Click to type an exact value" style="cursor: text;">1x</span>
+      </div>
+    </div>
+
+    <div class="group">
+      <p class="group-title">Squish (during bounce)</p>
+      <div class="row">
+        <label>Intensity</label>
+        <input type="range" id="squishAmt" min="0" max="60" value="3" step="1">
+        <span class="value" id="squishAmtVal" tabindex="0" role="button" title="Click to type an exact value" style="cursor: text;">3%</span>
+      </div>
+      <div class="row">
+        <label>Trigger point</label>
+        <input type="range" id="squishThresh" min="-100" max="0" value="-70" step="1">
+        <span class="value" id="squishThreshVal" tabindex="0" role="button" title="Click to type an exact value" style="cursor: text;">-0.70</span>
+      </div>
+    </div>
+
+    <div class="group">
+      <p class="group-title">Roll phase</p>
+      <div class="row">
+        <label>Duration</label>
+        <input type="range" id="rollDuration" min="800" max="4000" value="1800" step="100">
+        <span class="value" id="rollDurationVal" tabindex="0" role="button" title="Click to type an exact value" style="cursor: text;">1.8s</span>
+      </div>
+    </div>
+
+    <div class="group">
+      <p class="group-title">Creature colors</p>
+      <div class="row">
+        <label>Normal</label>
+        <input type="color" id="creatureColorNormal" value="#ffffff">
+        <span class="value" id="creatureColorNormalVal">#ffffff</span>
+      </div>
+      <div class="row">
+        <label>Sick</label>
+        <input type="color" id="creatureColorSick" value="#8fffcb">
+        <span class="value" id="creatureColorSickVal">#8fffcb</span>
+      </div>
+      <div class="row">
+        <label>Outline (normal)</label>
+        <input type="color" id="creatureOutlineNormal" value="#ffffff">
+        <span class="value" id="creatureOutlineNormalVal">#ffffff</span>
+      </div>
+      <div class="row">
+        <label>Outline (sick)</label>
+        <input type="color" id="creatureOutlineSick" value="#1a995e">
+        <span class="value" id="creatureOutlineSickVal">#1a995e</span>
+      </div>
+    </div>
+
+    <div class="group">
+      <p class="group-title">"Ready to exist" popup</p>
+      <div class="row">
+        <label>Width</label>
+        <input type="range" id="birthPromptW" min="100" max="260" value="180" step="5">
+        <span class="value" id="birthPromptWVal" tabindex="0" role="button" title="Click to type an exact value" style="cursor: text;">180px</span>
+      </div>
+      <div class="row">
+        <label>Height</label>
+        <input type="range" id="birthPromptH" min="40" max="140" value="70" step="5">
+        <span class="value" id="birthPromptHVal" tabindex="0" role="button" title="Click to type an exact value" style="cursor: text;">70px</span>
+      </div>
+      <div class="row">
+        <label>Corner radius</label>
+        <input type="range" id="birthPromptRadius" min="0" max="35" value="14" step="1">
+        <span class="value" id="birthPromptRadiusVal" tabindex="0" role="button" title="Click to type an exact value" style="cursor: text;">14px</span>
+      </div>
+      <div class="row">
+        <label>Fill color</label>
+        <input type="color" id="birthPromptFillColor" value="#bdf2ff">
+        <span class="value" id="birthPromptFillColorVal">#bdf2ff</span>
+      </div>
+      <div class="row">
+        <label>Text color</label>
+        <input type="color" id="birthPromptTextColor" value="#1c1b19">
+        <span class="value" id="birthPromptTextColorVal">#1c1b19</span>
+      </div>
+    </div>
+
+<div class="group"><p class="group-title">Lava lamp</p>
+<div class="row"><label>Split interval</label><input type="range" id="lavaInterval" min="1" max="120" value="6" step="0.5"><span class="value" id="lavaIntervalVal">6s</span></div>
+<div class="row"><label>Maximum cells</label><input type="range" id="lavaCount" min="1" max="16" value="7" step="1"><span class="value" id="lavaCountVal">7</span></div>
+<div class="row"><label>Flow speed</label><input type="range" id="lavaSpeed" min="0.2" max="3" value="1" step="0.1"><span class="value" id="lavaSpeedVal">1×</span></div>
+<div class="row"><label>Outline thickness</label><input type="range" id="lavaOutlineWidth" min="0" max="8" value="0" step="0.25"><span class="value" id="lavaOutlineWidthVal">0pt</span></div>
+<div class="row"><label>Fill opacity</label><input type="range" id="lavaFillOpacity" min="0" max="100" value="95" step="1"><span class="value" id="lavaFillOpacityVal">95%</span></div>
+<div class="row"><label>Outline opacity</label><input type="range" id="lavaOutlineOpacity" min="0" max="100" value="100" step="1"><span class="value" id="lavaOutlineOpacityVal">100%</span></div>
+<div class="row"><label>Lava color</label><input type="color" id="lavaFill" value="#ff683b"><span class="value" id="lavaFillVal">#ff683b</span></div>
+<div class="row"><label>Outline color</label><input type="color" id="lavaOutline" value="#ffd49a"><span class="value" id="lavaOutlineVal">#ffd49a</span></div>
+<div class="row"><label>Background</label><input type="color" id="lavaBackground" value="#191027"><span class="value" id="lavaBackgroundVal">#191027</span></div>
+</div>
+<div class="group"><p class="group-title">Egg — mitosis / lava lamp</p>
+<div class="row"><label>Split interval</label><input type="range" id="mitosisInterval" min="1" max="120" value="6" step="0.5"><span class="value" id="mitosisIntervalVal">6s</span></div>
+<div class="row"><label>Maximum cells</label><input type="range" id="mitosisCount" min="1" max="16" value="8" step="1"><span class="value" id="mitosisCountVal">8</span></div>
+<div class="row"><label>Outline thickness</label><input type="range" id="mitosisOutlineWidth" min="0" max="8" value="1" step="0.25"><span class="value" id="mitosisOutlineWidthVal">1pt</span></div>
+<div class="row"><label>Fill opacity</label><input type="range" id="mitosisFillOpacity" min="0" max="100" value="85" step="1"><span class="value" id="mitosisFillOpacityVal">85%</span></div>
+<div class="row"><label>Outline opacity</label><input type="range" id="mitosisOutlineOpacity" min="0" max="100" value="100" step="1"><span class="value" id="mitosisOutlineOpacityVal">100%</span></div>
+<div class="row"><label>Cell fill</label><input type="color" id="mitosisFill" value="#382f1a"><span class="value" id="mitosisFillVal">#382f1a</span></div>
+<div class="row"><label>Cell outline</label><input type="color" id="mitosisOutline" value="#ffffff"><span class="value" id="mitosisOutlineVal">#ffffff</span></div>
+</div>
+    <div class="group">
+      <p class="group-title">Egg colors (placeholder art)</p>
+      <div class="row">
+        <label>Outline + spots</label>
+        <input type="color" id="eggOutlineColor" value="#ffffff">
+        <span class="value" id="eggOutlineColorVal">#ffffff</span>
+      </div>
+      <div class="row">
+        <label>Fill</label>
+        <input type="color" id="eggFillColor" value="#382f1a">
+        <span class="value" id="eggFillColorVal">#382f1a</span>
+      </div>
+    </div>
+
+    <div class="group">
+      <p class="group-title">Screen backgrounds</p>
+      <div class="row">
+        <label>Egg screen</label>
+        <input type="color" id="eggScreenBgColor" value="#eee7d8">
+        <span class="value" id="eggScreenBgColorVal">#eee7d8</span>
+      </div>
+      <div class="row">
+        <label>Creature screen</label>
+        <input type="color" id="creatureScreenBgColor" value="#eee7d8">
+        <span class="value" id="creatureScreenBgColorVal">#eee7d8</span>
+      </div>
+    </div>
+
+    <div class="group">      <p class="group-title">Cracking</p>
+      <div class="row">
+        <label>Crack after</label>
+        <input type="range" id="crackAfter" min="1000" max="30000" value="10000" step="500">
+        <span class="value" id="crackAfterVal" tabindex="0" role="button" title="Click to type an exact value" style="cursor: text;">10s</span>
+      </div>
+      <div class="row">
+        <label>Crack build time</label>
+        <input type="range" id="crackBuild" min="1000" max="20000" value="8000" step="500">
+        <span class="value" id="crackBuildVal" tabindex="0" role="button" title="Click to type an exact value" style="cursor: text;">8.0s</span>
+      </div>
+      <div class="row">
+        <label>Ready to exist</label>
+        <input type="range" id="birthPromptAfter" min="5000" max="60000" value="29000" step="1000">
+        <span class="value" id="birthPromptAfterVal" tabindex="0" role="button" title="Click to type an exact value" style="cursor: text;">29s</span>
+      </div>
+    </div>
+
+    <div class="group">
+      <p class="group-title">Poop (real time)</p>
+      <div class="row">
+        <label>Appears after</label>
+        <input type="range" id="poopAfter" min="1" max="60" value="1" step="1">
+        <span class="value" id="poopAfterVal" tabindex="0" role="button" title="Click to type an exact value" style="cursor: text;">1min</span>
+      </div>
+      <div class="row">
+        <label>Max amount</label>
+        <input type="range" id="poopCount" min="1" max="30" value="15" step="1">
+        <span class="value" id="poopCountVal" tabindex="0" role="button" title="Click to type an exact value" style="cursor: text;">15</span>
+      </div>
+      <div class="row">
+        <label>Spawn interval</label>
+        <input type="range" id="poopInterval" min="1" max="60" value="1" step="1">
+        <span class="value" id="poopIntervalVal" tabindex="0" role="button" title="Click to type an exact value" style="cursor: text;">1min</span>
+      </div>
+    </div>
+
+<div class="group" id="statTimingControls"><p class="group-title">Stats — timing &amp; rewards</p><p style="font-size:11px">Decay uses time while the app is running. Amounts are percentage points. Set a loss to 0 to disable it. Rewards apply when an action starts. Waste and sickness timers are below.</p>
+<div class="row"><label for="fullnessEvery">Fullness decreases every</label><input type="range" id="fullnessEvery" min="1" max="3600" step="1" value="15"><span class="value" id="fullnessEveryVal" tabindex="0" role="button" title="Click to type an exact value" style="cursor: text;">15 s</span></div>
+<div class="row"><label for="fullnessLoss">Fullness lost per tick</label><input type="range" id="fullnessLoss" min="0" max="100" step="1" value="5"><span class="value" id="fullnessLossVal" tabindex="0" role="button" title="Click to type an exact value" style="cursor: text;">5 pts</span></div>
+<div class="row"><label for="energyEvery">Energy decreases every</label><input type="range" id="energyEvery" min="1" max="3600" step="1" value="60"><span class="value" id="energyEveryVal" tabindex="0" role="button" title="Click to type an exact value" style="cursor: text;">60 s</span></div>
+<div class="row"><label for="energyLoss">Energy lost per tick</label><input type="range" id="energyLoss" min="0" max="100" step="1" value="5"><span class="value" id="energyLossVal" tabindex="0" role="button" title="Click to type an exact value" style="cursor: text;">5 pts</span></div>
+<div class="row"><label for="happinessEvery">Happiness decreases every</label><input type="range" id="happinessEvery" min="1" max="3600" step="1" value="60"><span class="value" id="happinessEveryVal" tabindex="0" role="button" title="Click to type an exact value" style="cursor: text;">60 s</span></div>
+<div class="row"><label for="happinessLoss">Happiness lost per tick (0 = off)</label><input type="range" id="happinessLoss" min="0" max="100" step="1" value="3"><span class="value" id="happinessLossVal" tabindex="0" role="button" title="Click to type an exact value" style="cursor: text;">3 pts</span></div>
+<div class="row"><label for="feedFullness">Feed: fullness gain</label><input type="range" id="feedFullness" min="0" max="100" step="1" value="20"><span class="value" id="feedFullnessVal" tabindex="0" role="button" title="Click to type an exact value" style="cursor: text;">20 pts</span></div>
+<div class="row"><label for="feedHappiness">Feed: happiness gain</label><input type="range" id="feedHappiness" min="0" max="100" step="1" value="15"><span class="value" id="feedHappinessVal" tabindex="0" role="button" title="Click to type an exact value" style="cursor: text;">15 pts</span></div>
+<div class="row"><label for="breatheHappiness">Breathe: happiness gain</label><input type="range" id="breatheHappiness" min="0" max="100" step="1" value="30"><span class="value" id="breatheHappinessVal" tabindex="0" role="button" title="Click to type an exact value" style="cursor: text;">30 pts</span></div>
+<div class="row"><label for="healHappiness">Heal: happiness gain</label><input type="range" id="healHappiness" min="0" max="100" step="1" value="25"><span class="value" id="healHappinessVal" tabindex="0" role="button" title="Click to type an exact value" style="cursor: text;">25 pts</span></div>
+<div class="row"><label for="poopHappinessLoss">Waste: happiness lost per spawn</label><input type="range" id="poopHappinessLoss" min="0" max="100" step="1" value="3"><span class="value" id="poopHappinessLossVal" tabindex="0" role="button" title="Click to type an exact value" style="cursor: text;">3 pts</span></div>
+<div class="row"><label for="starvationDelay">Empty fullness to sickness</label><input type="range" id="starvationDelay" min="1" max="3600" step="1" value="120"><span class="value" id="starvationDelayVal" tabindex="0" role="button" title="Click to type an exact value" style="cursor: text;">120 s</span></div>
+<div class="row"><label for="feedDuration">Feeding animation duration</label><input type="range" id="feedDuration" min="0.5" max="10" step="0.1" value="1.8"><span class="value" id="feedDurationVal" tabindex="0" role="button" title="Click to type an exact value" style="cursor: text;">1.8 s</span></div>
+<div class="row"><label for="breathStep">Breathing phase duration</label><input type="range" id="breathStep" min="1" max="15" step="1" value="4"><span class="value" id="breathStepVal" tabindex="0" role="button" title="Click to type an exact value" style="cursor: text;">4 s</span></div>
+<div class="row"><label for="happyDuration">Happy / healing animation duration</label><input type="range" id="happyDuration" min="0.5" max="15" step="0.1" value="2"><span class="value" id="happyDurationVal" tabindex="0" role="button" title="Click to type an exact value" style="cursor: text;">2 s</span></div>
+</div>
+    <div class="group">
+      <p class="group-title">Sickness &amp; death (real time)</p>
+      <div class="row">
+        <label>Sick after (poops)</label>
+        <input type="range" id="sickThreshold" min="1" max="30" value="2" step="1">
+        <span class="value" id="sickThresholdVal" tabindex="0" role="button" title="Click to type an exact value" style="cursor: text;">2</span>
+      </div>
+      <div class="row">
+        <label>Die after sick</label>
+        <input type="range" id="deathAfter" min="1" max="60" value="1" step="1">
+        <span class="value" id="deathAfterVal" tabindex="0" role="button" title="Click to type an exact value" style="cursor: text;">1min</span>
+      </div>
+    </div>
+
+    <div class="group">
+      <p class="group-title">Death screen appearance</p>
+      <div class="row">
+        <label>Ghost X</label>
+        <input type="range" id="deathGhostX" min="-80" max="80" value="0" step="2">
+        <span class="value" id="deathGhostXVal" tabindex="0" role="button" title="Click to type an exact value" style="cursor: text;">0px</span>
+      </div>
+      <div class="row">
+        <label>Ghost Y</label>
+        <input type="range" id="deathGhostY" min="-60" max="60" value="0" step="2">
+        <span class="value" id="deathGhostYVal" tabindex="0" role="button" title="Click to type an exact value" style="cursor: text;">0px</span>
+      </div>
+      <div class="row">
+        <label>Text Y</label>
+        <input type="range" id="deathTextY" min="100" max="198" value="180" step="2">
+        <span class="value" id="deathTextYVal" tabindex="0" role="button" title="Click to type an exact value" style="cursor: text;">180px</span>
+      </div>
+      <div class="row">
+        <label>Ghost color</label>
+        <input type="color" id="deathGhostFillColor" value="#eef1f7">
+        <span class="value" id="deathGhostFillColorVal">#eef1f7</span>
+      </div>
+      <div class="row">
+        <label>Eye color</label>
+        <input type="color" id="deathEyeColor" value="#3a3f4d">
+        <span class="value" id="deathEyeColorVal">#3a3f4d</span>
+      </div>
+      <div class="row">
+        <label>Text color</label>
+        <input type="color" id="deathTextColor" value="#3a3f4d">
+        <span class="value" id="deathTextColorVal">#3a3f4d</span>
+      </div>
+    </div>
+
+    <div class="group">
+      <p class="group-title">Text customization</p>
+      <div class="row">
+        <label>Boot line 1</label>
+        <input type="text" id="textBootLine1" value="PRESS BUTTON TO">
+      </div>
+      <div class="row">
+        <label>Boot line 2</label>
+        <input type="text" id="textBootLine2" value="DOWNLOAD SOUL">
+      </div>
+      <div class="row">
+        <label>Birth title</label>
+        <input type="text" id="textBirthTitle" value="Im Alive!">
+      </div>
+      <div class="row">
+        <label>Birth subtitle</label>
+        <input type="text" id="textBirthSubtitle" value="press button">
+      </div>
+      <div class="row">
+        <label>Naming prompt</label>
+        <input type="text" id="textNamingTitle" value="NAME YOUR CREATURE">
+      </div>
+      <div class="row">
+        <label>Breathe: inhale</label>
+        <input type="text" id="textBreatheInhale" value="Inhale">
+      </div>
+      <div class="row">
+        <label>Breathe: hold</label>
+        <input type="text" id="textBreatheHold" value="Hold">
+      </div>
+      <div class="row">
+        <label>Breathe: exhale</label>
+        <input type="text" id="textBreatheExhale" value="Exhale">
+      </div>
+      <div class="row">
+        <label>Death message</label>
+        <input type="text" id="textDeathMessage" value="resurrect to try again">
+      </div>
+      <div class="row">
+        <label>Hungry message</label>
+        <input type="text" id="textHungryMessage" value="I'm hungry!">
+      </div>
+    </div>
+
+    <div class="group">
+      <p class="group-title">Sequence timing</p>
+      <div class="row">
+        <label>Idle hold</label>
+        <input type="range" id="idleDuration" min="1000" max="10000" value="5000" step="250">
+        <span class="value" id="idleDurationVal" tabindex="0" role="button" title="Click to type an exact value" style="cursor: text;">5.0s</span>
+      </div>
+    </div>
+
+    <div class="group">
+      <p class="group-title">Screensaver</p>
+      <div class="row">
+        <label>Trigger after</label>
+        <input type="range" id="screensaverTrigger" min="5" max="120" value="30" step="5">
+        <span class="value" id="screensaverTriggerVal" tabindex="0" role="button" title="Click to type an exact value" style="cursor: text;">30s</span>
+      </div>
+    </div>
+
+    <div class="group">
+      <p class="group-title">Boot &amp; falling</p>
+      <div class="row">
+        <label>Cloud speed</label>
+        <input type="range" id="cloudSpeed" min="0" max="300" value="10" step="5">
+        <span class="value" id="cloudSpeedVal" tabindex="0" role="button" title="Click to type an exact value" style="cursor: text;">0.1x</span>
+      </div>
+      <div class="row">
+        <label>Cloud size</label>
+        <input type="range" id="cloudSize" min="50" max="300" value="210" step="5">
+        <span class="value" id="cloudSizeVal" tabindex="0" role="button" title="Click to type an exact value" style="cursor: text;">2.1x</span>
+      </div>
+      <div class="row">
+        <label>Cloud spread</label>
+        <input type="range" id="cloudSpread" min="30" max="200" value="120" step="5">
+        <span class="value" id="cloudSpreadVal" tabindex="0" role="button" title="Click to type an exact value" style="cursor: text;">1.2x</span>
+      </div>
+      <div class="row">
+        <label>Cloud height</label>
+        <input type="range" id="cloudHeight" min="-40" max="40" value="0" step="2">
+        <span class="value" id="cloudHeightVal" tabindex="0" role="button" title="Click to type an exact value" style="cursor: text;">0px</span>
+      </div>
+      <div class="row">
+        <label>Text blink speed</label>
+        <input type="range" id="promptBlink" min="150" max="1500" value="800" step="50">
+        <span class="value" id="promptBlinkVal" tabindex="0" role="button" title="Click to type an exact value" style="cursor: text;">800ms</span>
+      </div>
+      <div class="row">
+        <label>Transition length</label>
+        <input type="range" id="fallDuration" min="500" max="6000" value="3050" step="50">
+        <span class="value" id="fallDurationVal" tabindex="0" role="button" title="Click to type an exact value" style="cursor: text;">3.0s</span>
+      </div>
+      <div class="row">
+        <label>Egg fade-in</label>
+        <input type="range" id="eggFadeDuration" min="0" max="3000" value="800" step="50">
+        <span class="value" id="eggFadeDurationVal" tabindex="0" role="button" title="Click to type an exact value" style="cursor: text;">0.8s</span>
+      </div>
+    </div>
+
+    <div class="group">
+      <p class="group-title">Breathing exercise</p>
+      <div class="row">
+        <label>Cycles</label>
+        <input type="range" id="breathCycles" min="1" max="6" value="4" step="1">
+        <span class="value" id="breathCyclesVal" tabindex="0" role="button" title="Click to type an exact value" style="cursor: text;">4</span>
+      </div>
+      <div class="row">
+        <label>Circle Y position</label>
+        <input type="range" id="breathCircleY" min="30" max="150" value="96" step="2">
+        <span class="value" id="breathCircleYVal" tabindex="0" role="button" title="Click to type an exact value" style="cursor: text;">96px</span>
+      </div>
+      <div class="row">
+        <label>Text Y position</label>
+        <input type="range" id="breathTextY" min="100" max="198" value="172" step="2">
+        <span class="value" id="breathTextYVal" tabindex="0" role="button" title="Click to type an exact value" style="cursor: text;">172px</span>
+      </div>
+    </div>
+
+    <div class="group">
+      <p class="group-title">Your artwork (optional)</p>
+      <div class="art-buttons">
+        <button class="btn" id="uploadNormalBtn">Upload normal frame</button>
+        <button class="btn" id="uploadSquishBtn">Upload squish frame</button>
+        <button class="btn" id="clearArtBtn">Use placeholder</button>
+      </div>
+      <input type="file" id="uploadNormal" accept="image/png,image/jpeg">
+      <input type="file" id="uploadSquish" accept="image/png,image/jpeg">
+    </div>
+
+    <div class="group">
+      <div class="copy-row">
+        <p class="group-title" style="margin:0;">Code values for your sketch</p>
+        <span class="copied-msg" id="copiedMsg">Copied</span>
+      </div>
+      <div class="code-box" id="codeBox"><span class="kw">const int</span>   ROCK_REPEATS     = <span class="num">2</span>;
+<span class="kw">const float</span> ROCK_CYCLE_MS    = <span class="num">1130</span>.0;
+<span class="kw">const float</span> TILT_AMP_DEG     = <span class="num">6.0</span>;
+
+<span class="kw">const int</span>   BOUNCE_REPEATS   = <span class="num">1</span>;
+<span class="kw">const float</span> BOUNCE_CYCLE_MS  = <span class="num">790</span>.0;
+<span class="kw">const int</span>   BOUNCE_AMP_PX    = <span class="num">13</span>;
+
+<span class="kw">const float</span> SQUISH_AMOUNT    = <span class="num">0.03</span>;
+<span class="kw">const float</span> SQUISH_THRESHOLD = <span class="num">-0.70</span>;
+
+<span class="kw">const unsigned long</span> ROLL_MS   = <span class="num">1800</span>;
+<span class="kw">const unsigned long</span> IDLE_MS   = <span class="num">5000</span>;</div>
+      <div style="margin-top:12px;">
+        <button class="btn primary" id="copyBtn">Copy to clipboard</button>
+        <button class="btn" id="bakeBtn">RE-BAKE</button><a id="bakedSaveLink" class="btn primary" href="blob:null/e091d37b-38eb-4043-b79c-80f7028ec75a" download="VP1.4.3-DREAM-baked.html" style="display: inline-block; margin-left: 8px; text-decoration: none;">SAVE BAKED HTML ↓</a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// --- Developer tools / beta presentation mode ---
+const devToggleBtn = document.getElementById('devToggleBtn');
+
+function setPresentationMode(enabled) {
+  document.body.classList.toggle('presentation-mode', enabled);
+  devToggleBtn.textContent = enabled ? 'DEV' : 'HIDE DEV';
+  devToggleBtn.title = enabled ? 'Show developer tools' : 'Hide developer tools';
+}
+
+function updatePresentationScale() {
+  if (!document.body.classList.contains('presentation-mode')) return;
+
+  const shell = document.querySelector('.device-shell');
+  if (!shell) return;
+
+  // Measure the physical object without its presentation transform.
+  const previousTransform = shell.style.transform;
+  shell.style.transform = 'none';
+  const rawRect = shell.getBoundingClientRect();
+  shell.style.transform = previousTransform;
+
+  const horizontalMargin = 24;
+  const verticalMargin = 24;
+  const availableW = Math.max(160, window.innerWidth - horizontalMargin);
+  const availableH = Math.max(160, window.innerHeight - verticalMargin);
+
+  // Cap the enlargement, but always shrink enough to keep the complete
+  // shell inside the viewport.
+  const scale = Math.min(
+    1.45,
+    availableW / rawRect.width,
+    availableH / rawRect.height
+  );
+
+  document.body.style.setProperty(
+    '--presentation-scale',
+    Math.max(0.55, scale).toFixed(3)
+  );
+}
+
+function togglePresentationMode() {
+  setPresentationMode(!document.body.classList.contains('presentation-mode'));
+  requestAnimationFrame(updatePresentationScale);
+}
+
+devToggleBtn.addEventListener('click', togglePresentationMode);
+
+// Press D anywhere (except while typing) to toggle the developer tools.
+document.addEventListener('keydown', (e) => {
+  if (e.key.toLowerCase() === 'd' && !['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) {
+    togglePresentationMode();
+  }
+});
+
+// Shared beta links can use ?dev=1 when you want the developer tools visible.
+let showDevTools = false;
+try {
+  showDevTools = new URLSearchParams(window.location.search).get('dev') === '1';
+} catch (e) {}
+setPresentationMode(!showDevTools);
+
+window.addEventListener('resize', updatePresentationScale);
+window.addEventListener('orientationchange', () => {
+  setTimeout(updatePresentationScale, 100);
+});
+requestAnimationFrame(updatePresentationScale);
+
+const canvas = document.getElementById('screen');
+const ctx = canvas.getContext('2d');
+const W = canvas.width, H = canvas.height;
+
+let tiltAmpDeg = 6, tiltPeriodMs = 700, rockRepeats = 2;
+let screensaverTriggerMs = 30000;
+let lastInteractionAt = null;
+let screensaverActive = false;
+let bounceAmpPx = 10, bouncePeriodMs = 550, bounceRepeats = 1;
+let squishAmt = 0.25, squishThreshold = -0.70;
+let idleDurationMs = 5000;
+let rollDurationMs = 1800;
+
+let normalImg = null, squishImg = null;
+let pokeEnergy = 0;
+
+// --- Cracking, after the loop has been running a while ---
+let loopEnterTime = null;
+let crackAfterMs = 10000; // starts cracking after this long in the loop
+let crackBuildMs = 8000;  // how long it takes to reach full crack pattern once started
+
+// --- Birth prompt, hatching, and the creature that follows ---
+let birthPromptAfterMs = 20000;
+let birthPromptW = 180, birthPromptH = 70, birthPromptRadius = 14;
+let birthPromptFillColor = '#c98a2c';
+let birthPromptTextColor = '#1c1b19';
+let birthPromptOverlayDrawn = false;
+let namingOverlayDrawn = false;
+let creatureName = '';
+let hatchStartTime = null;
+const HATCH_DURATION_MS = 900;
+let creatureEnterTime = null;
+let nextBlinkAt = null;
+let blinkStartAt = null;
+const BLINK_DURATION_MS = 150;
+
+// --- Poop and the happy-dance reward for cleaning it up ---
+// Poop timing runs on real wall-clock time (Date.now()), not animation
+// frame time, and is saved/restored across sessions - see the Real-time
+// persistence section further down. poopAfterMs/poopSpawnIntervalMs are
+// still stored in milliseconds internally; the sliders just present them
+// in minutes since that's the realistic scale for this timer.
+let poopAfterMs = 30 * 60000;
+let poops = []; // {x, y, seed} for each currently-visible poop
+let nextPoopSpawnAt = null; // a real Date.now()-based timestamp, not a t-based one
+let poopCountMax = 15;
+let poopSpawnIntervalMs = 5 * 1000;
+let happyUntil = null;
+let HAPPY_DURATION_MS = 2000;
+
+// --- Sickness, triggered by an overflowing poop pile ---
+let sickThreshold = 10;
+let healUntil = null;
+let sickStartedAt = null; // real Date.now() timestamp - drives real-time death
+let deathAfterMs = 60 * 60000;
+
+// --- Hunger, triggered by real time since last fed ---
+let lastFedAt = null; // real Date.now() timestamp
+
+
+// --- Death screen appearance ---
+let deathGhostX = 0, deathGhostY = 0;
+let deathTextY = H - 20;
+let deathGhostFillColor = '#eef1f7';
+let deathEyeColor = '#3a3f4d';
+let deathTextColor = '#3a3f4d';
+
+// --- Customizable on-screen text ---
+let textBirthTitle = 'READY TO EXIST';
+let textBirthSubtitle = 'press button';
+let textNamingTitle = 'NAME YOUR CREATURE';
+let textBootLine1 = 'PRESS BUTTON TO';
+let textBootLine2 = 'DOWNLOAD SOUL';
+let textBreatheInhale = 'Inhale';
+let textBreatheHold = 'Hold';
+let textBreatheExhale = 'Exhale';
+let textDeathMessage = 'resurrect to try again';
+let textHungryMessage = "I'm hungry!";
+
+// --- Feeding ---
+let feedingStartTime = null;
+let FEED_DURATION_MS = 1800;
+const FEED_OPEN_FRAC = 0.15;
+const FEED_CLOSE_FRAC = 0.15;
+const FEED_SPARKLE_COUNT = 4;
+const FEED_TILT_DEG = 12;
+
+// --- Box breathing exercise ---
+let breathingStartTime = null;
+let BREATH_STEP_MS = 4000; // inhale, hold, exhale, hold - 4 seconds each
+const BREATH_RETURN_MS = 700; // time to morph back into the normal body shape
+
+const eggBaseW = 70, eggBaseH = 90;
+const centerX = W / 2, baseY = H - 22;
+
+// --- Settings persistence ---
+// Saves every slider's value to localStorage on change, and restores them
+// on load, so reopening this file later picks up where you left off.
+// Note: this only works when the file is opened directly in a browser tab
+// (e.g. from your downloads folder) - inline previews inside some chat
+// interfaces sandbox storage and won't persist between sessions there.
+const SETTINGS_KEY = 'tamagotchiEggLabSettings';
+
+function loadSavedSettings() {
+  try {
+    const raw = localStorage.getItem(SETTINGS_KEY);
+    if (!raw) return;
+    const saved = JSON.parse(raw);
+    document.querySelectorAll('input[type=range], input[type=color], input[type=text]').forEach(el => {
+      if (saved[el.id] !== undefined) el.value = saved[el.id];
+    });
+  } catch (e) {
+    // corrupt data or storage unavailable (e.g. private browsing) - ignore
+  }
+}
+
+function saveAllSliderSettings() {
+  try {
+    const settings = {};
+    document.querySelectorAll('input[type=range], input[type=color], input[type=text]').forEach(el => {
+      settings[el.id] = el.value;
+    });
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
+  } catch (e) {
+    // storage unavailable - fail silently, sliders still work in-session
+  }
+}
+
+loadSavedSettings();
+
+// --- Real-time creature persistence ---
+// Unlike the animation-frame timers used elsewhere in this file, the
+// creature's live state (whether it exists, its poop pile, sickness) is
+// saved against real Date.now() timestamps, so it can be reconstructed
+// accurately no matter how long the tab was closed, backgrounded, or
+// even fully discarded by the OS - browsers freeze JS execution in
+// backgrounded tabs, so there's no way to keep an animation loop running
+// for hours; instead we compute what *should* have happened from elapsed
+// real time the next time the page opens.
+const CREATURE_SAVE_KEY = 'tamagotchiCreatureSave';
+
+function saveCreatureState() {
+  if (creatureBornAt === null) return; // nothing alive yet, nothing to save
+  try {
+    localStorage.setItem(CREATURE_SAVE_KEY, JSON.stringify({
+      born: creatureBornAt,
+      name: creatureName,
+      nextPoopSpawnAt: nextPoopSpawnAt,
+      poopCount: poops.length,
+      isSick: isSick,
+      sickStartedAt: sickStartedAt,
+      savedAt: Date.now(),
+    }));
+  } catch (e) {
+    // storage unavailable - the creature just won't survive a reload
+  }
+}
+
+function clearCreatureSave() {
+  try { localStorage.removeItem(CREATURE_SAVE_KEY); } catch (e) {}
+}
+
+// Reads the save (if any) and fast-forwards the poop timer by however
+// many real spawn-intervals have elapsed since it was last open, capped
+// at the configured max - so reopening after a long gap shows a
+// realistically neglected (or fine, if you were quick) creature instantly,
+// without needing to have been running the whole time. Also checks
+// whether enough real time passed while sick to have died in the meantime.
+function restoreCreatureIfSaved() {
+  let saved;
+  try {
+    const raw = localStorage.getItem(CREATURE_SAVE_KEY);
+    if (!raw) return false;
+    saved = JSON.parse(raw);
+  } catch (e) {
+    return false;
+  }
+  if (!saved || typeof saved.born !== 'number') return false;
+
+  creatureBornAt = saved.born;
+  creatureName = typeof saved.name === 'string' ? saved.name : '';
+  poops = Array.from({ length: Math.min(saved.poopCount, poopCountMax) }, () => randomPoopPosition());
+  nextPoopSpawnAt = saved.nextPoopSpawnAt;
+
+  // Catch up any additional spawn-intervals that elapsed while this was
+  // closed - each one adds a poop and pushes the timer forward, same as
+  // if you'd had the tab open the whole time.
+  if (nextPoopSpawnAt !== null) {
+    while (Date.now() >= nextPoopSpawnAt && poops.length < poopCountMax) {
+      poops.push(randomPoopPosition());
+    
+      nextPoopSpawnAt += poopSpawnIntervalMs;
+    }
+    if (poops.length >= poopCountMax) nextPoopSpawnAt = null;
+  }
+
+  isSick = poops.length >= sickThreshold; // recomputed fresh rather than trusting the saved flag
+
+  if (isSick) {
+    // Keep the original sick-since timestamp if it was already sick when
+    // saved, so the death countdown continues rather than restarting.
+    sickStartedAt = (saved.isSick && typeof saved.sickStartedAt === 'number') ? saved.sickStartedAt : Date.now();
+  } else {
+    sickStartedAt = null;
+  }
+
+  creatureEnterTime = null; // set on the first real frame
+  phaseIndex = 0;
+  phaseStartTime = null;
+  nextBlinkAt = null;
+  blinkStartAt = null;
+
+  if (isSick && sickStartedAt !== null && Date.now() - sickStartedAt >= deathAfterMs) {
+    // Enough real time passed while sick and away that it died in the meantime.
+    appState = 'dead';
+    pauseBtn.style.display = 'none';
+    breatheBtn.style.display = 'none';
+    feedBtn.style.display = 'none';
+    cleanBtn.style.display = 'none';
+    healBtn.style.display = 'none';
+    saveCreatureState();
+    return true;
+  }
+
+  appState = 'creature';
+  pauseBtn.style.display = 'none';
+  breatheBtn.style.display = 'inline-block';
+  feedBtn.style.display = 'inline-block';
+  cleanBtn.style.display = poops.length > 0 ? 'inline-block' : 'none';
+  healBtn.style.display = isSick ? 'inline-block' : 'none';
+
+  return true;
+}
+
+function bindSlider(id, valId, setter, format) {
+  const el = document.getElementById(id);
+  const valEl = document.getElementById(valId);
+  const update = () => {
+    const v = parseFloat(el.value);
+    setter(v);
+    valEl.textContent = format(v);
+    updateCodeBox();
+    saveAllSliderSettings();
+  };
+  el.addEventListener('input', update);
+  valEl.tabIndex = 0;
+  valEl.setAttribute('role', 'button');
+  valEl.title = 'Click to type an exact value';
+  valEl.style.cursor = 'text';
+  function editValue() {
+    if (valEl.querySelector('input')) return;
+    const raw = Number(el.value);
+    // Some older controls store milliseconds but display seconds.
+    const display = format(raw);
+    const scale = /s$/.test(display) && !/ms$/.test(display) &&
+      Number(el.max) >= 1000 && Math.abs(parseFloat(display) * 1000 - raw) < 0.01 ? 1000 : 1;
+    const input = document.createElement('input');
+    input.type = 'number';
+    input.min = Number(el.min) / scale;
+    input.max = Number(el.max) / scale;
+    input.step = el.step === 'any' ? 'any' : Number(el.step || 1) / scale;
+    input.value = raw / scale;
+    input.title = `Range: ${input.min} to ${input.max}; step: ${input.step}`;
+    input.setAttribute('aria-label', (document.querySelector(`label[for="${id}"]`)?.textContent || el.closest('.row')?.querySelector('label')?.textContent || id) + ' exact value');
+    input.style.cssText = 'width:88px;max-width:100%;box-sizing:border-box;background:#141312;color:#f2ede2;border:1px solid #8a8478;border-radius:4px;padding:4px;font:inherit;';
+    valEl.textContent = '';
+    valEl.appendChild(input);
+    let finished = false;
+    function finish(cancel) {
+      if (finished) return;
+      finished = true;
+      const entered = input.valueAsNumber;
+      if (!cancel && Number.isFinite(entered)) {
+        // Native range normalization enforces each control's limits and step.
+        el.value = entered * scale;
+      }
+      update();
+    }
+    input.addEventListener('click', e => e.stopPropagation());
+    input.addEventListener('keydown', e => {
+      e.stopPropagation();
+      if (e.key === 'Enter' || e.key === 'Escape') {
+        e.preventDefault();
+        finish(e.key === 'Escape');
+        valEl.focus();
+      }
+    });
+    input.addEventListener('blur', () => finish(false));
+    input.focus();
+    input.select();
+  }
+  valEl.addEventListener('click', editValue);
+  valEl.addEventListener('keydown', e => {
+    if (e.target === valEl && (e.key === 'Enter' || e.key === ' ')) {
+      e.preventDefault();
+      editValue();
+    }
+  });
+  update();
+}
+
+function bindColor(id, valId, setter) {
+  const el = document.getElementById(id);
+  const valEl = document.getElementById(valId);
+  const update = () => {
+    const v = el.value;
+    setter(v);
+    valEl.textContent = v;
+    saveAllSliderSettings();
+  };
+  el.addEventListener('input', update);
+  update();
+}
+
+function bindText(id, setter) {
+  const el = document.getElementById(id);
+  const update = () => {
+    setter(el.value);
+    saveAllSliderSettings();
+  };
+  el.addEventListener('input', update);
+  update();
+}
+
+bindSlider('tiltAmp', 'tiltAmpVal', v => tiltAmpDeg = v, v => v.toFixed(1) + '°');
+bindSlider('tiltPeriod', 'tiltPeriodVal', v => tiltPeriodMs = v, v => v + 'ms');
+bindSlider('rockRepeats', 'rockRepeatsVal', v => rockRepeats = v, v => v + 'x');
+bindSlider('bounceAmp', 'bounceAmpVal', v => bounceAmpPx = v, v => v + 'px');
+bindSlider('bouncePeriod', 'bouncePeriodVal', v => bouncePeriodMs = v, v => v + 'ms');
+bindSlider('bounceRepeats', 'bounceRepeatsVal', v => bounceRepeats = v, v => v + 'x');
+bindSlider('squishAmt', 'squishAmtVal', v => squishAmt = v / 100, v => v + '%');
+bindSlider('squishThresh', 'squishThreshVal', v => squishThreshold = v / 100, v => (v/100).toFixed(2));
+bindSlider('idleDuration', 'idleDurationVal', v => idleDurationMs = v, v => (v/1000).toFixed(1) + 's');
+bindSlider('screensaverTrigger', 'screensaverTriggerVal', v => screensaverTriggerMs = v * 1000, v => v.toFixed(0) + 's');
+bindSlider('crackAfter', 'crackAfterVal', v => crackAfterMs = v, v => (v/1000).toFixed(0) + 's');
+bindSlider('crackBuild', 'crackBuildVal', v => crackBuildMs = v, v => (v/1000).toFixed(1) + 's');
+bindSlider('birthPromptAfter', 'birthPromptAfterVal', v => birthPromptAfterMs = v, v => (v/1000).toFixed(0) + 's');
+bindSlider('poopAfter', 'poopAfterVal', v => poopAfterMs = v * 60000, v => v.toFixed(0) + 'min');
+bindSlider('poopCount', 'poopCountVal', v => poopCountMax = v, v => v.toFixed(0));
+bindSlider('poopInterval', 'poopIntervalVal', v => poopSpawnIntervalMs = v * 60000, v => v.toFixed(0) + 'min');
+bindSlider('sickThreshold', 'sickThresholdVal', v => sickThreshold = v, v => v.toFixed(0));
+bindSlider('deathAfter', 'deathAfterVal', v => deathAfterMs = v * 60000, v => v.toFixed(0) + 'min');
+bindSlider('deathGhostX', 'deathGhostXVal', v => deathGhostX = v, v => v + 'px');
+bindSlider('deathGhostY', 'deathGhostYVal', v => deathGhostY = v, v => v + 'px');
+bindSlider('deathTextY', 'deathTextYVal', v => deathTextY = v, v => v + 'px');
+bindColor('deathGhostFillColor', 'deathGhostFillColorVal', v => deathGhostFillColor = v);
+bindColor('deathEyeColor', 'deathEyeColorVal', v => deathEyeColor = v);
+bindColor('deathTextColor', 'deathTextColorVal', v => deathTextColor = v);
+
+bindText('textBootLine1', v => textBootLine1 = v);
+bindText('textBootLine2', v => textBootLine2 = v);
+bindText('textBirthTitle', v => textBirthTitle = v);
+bindText('textBirthSubtitle', v => textBirthSubtitle = v);
+bindText('textNamingTitle', v => textNamingTitle = v);
+bindText('textBreatheInhale', v => textBreatheInhale = v);
+bindText('textBreatheHold', v => textBreatheHold = v);
+bindText('textBreatheExhale', v => textBreatheExhale = v);
+bindText('textDeathMessage', v => textDeathMessage = v);
+bindText('textHungryMessage', v => textHungryMessage = v);
+bindSlider('rollDuration', 'rollDurationVal', v => rollDurationMs = v, v => (v/1000).toFixed(1) + 's');
+
+function updateCodeBox() {
+  const box = document.getElementById('codeBox');
+  box.innerHTML =
+`<span class="kw">const int</span>   ROCK_REPEATS     = <span class="num">${rockRepeats}</span>;
+<span class="kw">const float</span> ROCK_CYCLE_MS    = <span class="num">${tiltPeriodMs.toFixed(0)}</span>.0;
+<span class="kw">const float</span> TILT_AMP_DEG     = <span class="num">${tiltAmpDeg.toFixed(1)}</span>;
+
+<span class="kw">const int</span>   BOUNCE_REPEATS   = <span class="num">${bounceRepeats}</span>;
+<span class="kw">const float</span> BOUNCE_CYCLE_MS  = <span class="num">${bouncePeriodMs.toFixed(0)}</span>.0;
+<span class="kw">const int</span>   BOUNCE_AMP_PX    = <span class="num">${bounceAmpPx.toFixed(0)}</span>;
+
+<span class="kw">const float</span> SQUISH_AMOUNT    = <span class="num">${squishAmt.toFixed(2)}</span>;
+<span class="kw">const float</span> SQUISH_THRESHOLD = <span class="num">${squishThreshold.toFixed(2)}</span>;
+
+<span class="kw">const unsigned long</span> ROLL_MS   = <span class="num">${rollDurationMs.toFixed(0)}</span>;
+<span class="kw">const unsigned long</span> IDLE_MS   = <span class="num">${idleDurationMs.toFixed(0)}</span>;`;
+}
+
+document.getElementById('copyBtn').addEventListener('click', () => {
+  const text = `const int   ROCK_REPEATS     = ${rockRepeats};
+const float ROCK_CYCLE_MS    = ${tiltPeriodMs.toFixed(0)}.0;
+const float TILT_AMP_DEG     = ${tiltAmpDeg.toFixed(1)};
+
+const int   BOUNCE_REPEATS   = ${bounceRepeats};
+const float BOUNCE_CYCLE_MS  = ${bouncePeriodMs.toFixed(0)}.0;
+const int   BOUNCE_AMP_PX    = ${bounceAmpPx.toFixed(0)};
+
+const float SQUISH_AMOUNT    = ${squishAmt.toFixed(2)};
+const float SQUISH_THRESHOLD = ${squishThreshold.toFixed(2)};
+
+const unsigned long ROLL_MS  = ${rollDurationMs.toFixed(0)};
+const unsigned long IDLE_MS  = ${idleDurationMs.toFixed(0)};`;
+  navigator.clipboard.writeText(text).then(() => {
+    const msg = document.getElementById('copiedMsg');
+    msg.classList.add('show');
+    setTimeout(() => msg.classList.remove('show'), 1200);
+  });
+});
+
+// --- Bake current Dev Tools settings into a new standalone HTML file ---
+// First click builds the file. The same control then becomes a REAL download
+// link, so the browser receives a second, explicit user click to save it.
+const bakeBtn = document.getElementById('bakeBtn');
+let bakedDownloadUrl = null;
+
+bakeBtn.addEventListener('click', () => {
+  try {
+    const bakedDocument = document.documentElement.cloneNode(true);
+
+    document.querySelectorAll('input[type="range"], input[type="color"], input[type="text"]').forEach(sourceInput => {
+      if (!sourceInput.id) return;
+      const bakedInput = bakedDocument.querySelector(`[id="${sourceInput.id}"]`);
+      if (!bakedInput) return;
+      bakedInput.setAttribute('value', sourceInput.value);
+    });
+
+    const bakedHtml = '<!DOCTYPE html>\n' + bakedDocument.outerHTML;
+    const blob = new Blob([bakedHtml], { type: 'text/html;charset=utf-8' });
+
+    if (bakedDownloadUrl) URL.revokeObjectURL(bakedDownloadUrl);
+    bakedDownloadUrl = URL.createObjectURL(blob);
+
+    // Create a visible, genuine link. No synthetic click, popup, or file picker.
+    let saveLink = document.getElementById('bakedSaveLink');
+    if (!saveLink) {
+      saveLink = document.createElement('a');
+      saveLink.id = 'bakedSaveLink';
+      saveLink.className = 'btn primary';
+      saveLink.style.display = 'inline-block';
+      saveLink.style.marginLeft = '8px';
+      saveLink.style.textDecoration = 'none';
+      bakeBtn.insertAdjacentElement('afterend', saveLink);
+    }
+
+    saveLink.href = bakedDownloadUrl;
+    saveLink.download = 'VP1.4.3-DREAM-baked.html';
+    saveLink.textContent = 'SAVE BAKED HTML ↓';
+
+    bakeBtn.textContent = 'RE-BAKE';
+  } catch (error) {
+    console.error('Bake HTML failed:', error);
+    bakeBtn.textContent = 'BAKE FAILED';
+  }
+});
+
+function wireUpload(btnId, inputId, setImg) {
+  const btn = document.getElementById(btnId);
+  const input = document.getElementById(inputId);
+  btn.addEventListener('click', () => input.click());
+  input.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const img = new Image();
+      img.onload = () => setImg(img);
+      img.src = ev.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+wireUpload('uploadNormalBtn', 'uploadNormal', img => normalImg = img);
+wireUpload('uploadSquishBtn', 'uploadSquish', img => squishImg = img);
+document.getElementById('clearArtBtn').addEventListener('click', () => {
+  normalImg = null;
+  squishImg = null;
+});
+
+function roundRectPath(c, x, y, w, h, r) {
+  c.beginPath();
+  c.moveTo(x + r, y);
+  c.arcTo(x + w, y, x + w, y + h, r);
+  c.arcTo(x + w, y + h, x, y + h, r);
+  c.arcTo(x, y + h, x, y, r);
+  c.arcTo(x, y, x + w, y, r);
+  c.closePath();
+}
+
+function drawBirthPromptOverlay() {
+  const boxX = (W - birthPromptW) / 2, boxY = (H - birthPromptH) / 2;
+  ctx.fillStyle = birthPromptFillColor;
+  roundRectPath(ctx, boxX, boxY, birthPromptW, birthPromptH, birthPromptRadius);
+  ctx.fill();
+  ctx.fillStyle = birthPromptTextColor;
+  ctx.font = "bold 16px 'Manrope', sans-serif";
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(textBirthTitle, W / 2, H / 2 - 10);
+  ctx.font = "12px 'Space Mono', monospace";
+  ctx.fillText(textBirthSubtitle, W / 2, H / 2 + 14);
+}
+
+const NAME_CHOICES = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ 0123456789-';
+const NAME_LIMIT = 8;
+let nameSlots = Array(NAME_LIMIT).fill('');
+let nameSlotIndex = 0;
+let nameConfirmOpen = false;
+
+function syncArcadeName() {
+  creatureNameInput.value = nameSlots.join('').trim();
+  namingOverlayDrawn = false;
+}
+function beginNaming() {
+  appState = 'naming';
+  nameSlots = Array(NAME_LIMIT).fill('');
+  nameSlots[0] = 'A';
+  nameSlotIndex = 0;
+  nameConfirmOpen = false;
+  syncArcadeName();
+  pauseBtn.style.display = 'none';
+  creatureNameInput.style.display = 'none';
+  confirmNameBtn.style.display = 'none';
+}
+function selectNameChoice() {
+  if (nameConfirmOpen) { confirmCreatureName(); return; }
+  if (nameSlotIndex === NAME_LIMIT - 1) {
+    nameConfirmOpen = true;
+  } else {
+    nameSlotIndex++;
+    if (!nameSlots[nameSlotIndex]) nameSlots[nameSlotIndex] = 'A';
+  }
+  syncArcadeName();
+}
+function cycleNameSlot() {
+  if (nameConfirmOpen) {
+    nameConfirmOpen = false;
+  } else {
+    const index = NAME_CHOICES.indexOf(nameSlots[nameSlotIndex]);
+    nameSlots[nameSlotIndex] = NAME_CHOICES[(index + 1) % NAME_CHOICES.length];
+  }
+  syncArcadeName();
+}
+function backNameSlot() {
+  if (nameConfirmOpen) nameConfirmOpen = false;
+  else nameSlotIndex = Math.max(0, nameSlotIndex - 1);
+  syncArcadeName();
+}
+function drawNamingOverlay() {
+  ctx.save();
+  ctx.fillStyle = eggScreenBgColor;
+  ctx.fillRect(0, 0, W, H);
+  ctx.fillStyle = '#1c1b19';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.font = "bold 14px 'Manrope', sans-serif";
+  ctx.fillText(nameConfirmOpen ? 'Birth this creature?' : textNamingTitle, W / 2, 30, W - 24);
+  if (nameConfirmOpen) {
+    ctx.font = "20px 'Space Mono', monospace";
+    ctx.fillText(creatureNameInput.value || '(empty)', W / 2, 90, W - 30);
+    ctx.font = "10px 'Space Mono', monospace";
+    ctx.fillText('A: confirm   B: edit', W / 2, 156);
+  } else {
+    for (let i = 0; i < NAME_LIMIT; i++) {
+      const x = W / 2 + (i - (NAME_LIMIT - 1) / 2) * 30;
+      if (i === nameSlotIndex) {
+        ctx.fillStyle = '#5b7a63';
+        ctx.fillRect(x - 13, 69, 26, 38);
+      }
+      ctx.fillStyle = i === nameSlotIndex ? '#f2ede2' : '#1c1b19';
+      ctx.font = "19px 'Space Mono', monospace";
+      ctx.fillText(nameSlots[i] === ' ' ? '·' : nameSlots[i] || '_', x, 88);
+    }
+    ctx.fillStyle = '#1c1b19';
+    ctx.font = "9px 'Space Mono', monospace";
+    ctx.fillText('B: change letter   A: next slot', W / 2, 139);
+    ctx.fillText('hold B: back   hold A: finish', W / 2, 158);
+    ctx.fillText('finish on your last letter', W / 2, 181);
+  }
+  ctx.restore();
+}
+
+// --- 8-bit style clouds ---
+// Each cloud is a small grid of filled blocks, drawn chunky/pixelated
+// rather than as a smooth curve, matching a retro handheld look.
+const CLOUD_PATTERN = [
+  '00111000',
+  '01111110',
+  '11111111',
+  '11111111',
+];
+
+function drawCloud8bit(x, y, blockSize, color) {
+  ctx.fillStyle = color;
+  for (let row = 0; row < CLOUD_PATTERN.length; row++) {
+    for (let col = 0; col < CLOUD_PATTERN[row].length; col++) {
+      if (CLOUD_PATTERN[row][col] === '1') {
+        ctx.fillRect(x + col * blockSize, y + row * blockSize, blockSize, blockSize);
+      }
+    }
+  }
+}
+
+const CLOUD_DEFS = [
+  { relX: -0.35, relY: 0.10, size: 5, dir: 1 },
+  { relX: 0.15,  relY: 0.20, size: 4, dir: -1 },
+  { relX: -0.05, relY: 0.33, size: 3, dir: 1 },
+];
+
+// Clouds during the boot screen: static-ish, gentle side-to-side drift.
+function drawClouds(t) {
+  CLOUD_DEFS.forEach(c => {
+    const baseX = centerX + c.relX * W * cloudSpreadMult;
+    const baseY = c.relY * H + cloudHeightOffset;
+    const speed = 0.006 * c.dir * cloudSpeedMult;
+    const drift = Math.sin(t * speed) * 14;
+    const size = Math.max(1, c.size * cloudSizeMult);
+    drawCloud8bit(baseX + drift, baseY, size, '#ffffff');
+  });
+}
+
+// Clouds during the transition: scale outward from a vanishing point
+// (simulating the camera pushing through them) while fading out.
+function drawCloudsZoomFade(t, progress) {
+  const zoom = 1 + progress * 3.5;
+  const alpha = 1 - smoothstep(progress);
+  const vanishX = centerX, vanishY = H * 0.35;
+
+  ctx.globalAlpha = alpha;
+  CLOUD_DEFS.forEach(c => {
+    const baseX = centerX + c.relX * W * cloudSpreadMult;
+    const baseY = c.relY * H + cloudHeightOffset;
+    const speed = 0.006 * c.dir * cloudSpeedMult;
+    const drift = Math.sin(t * speed) * 14;
+    const size = Math.max(1, c.size * cloudSizeMult);
+
+    // unscaled center of this cloud's pixel-block pattern (8 cols x 4 rows)
+    const cx = baseX + drift + size * 4;
+    const cy = baseY + size * 2;
+
+    const scaledCx = vanishX + (cx - vanishX) * zoom;
+    const scaledCy = vanishY + (cy - vanishY) * zoom;
+    const scaledSize = size * zoom;
+
+    drawCloud8bit(scaledCx - scaledSize * 4, scaledCy - scaledSize * 2, scaledSize, '#ffffff');
+  });
+  ctx.globalAlpha = 1;
+}
+
+function drawBootScreen(t) {
+  ctx.fillStyle = '#c9dcef'; // pale 8-bit sky
+  ctx.fillRect(0, 0, W, H);
+  drawClouds(t);
+
+  // Blinking prompt, classic "press start" style
+  const visible = Math.floor(t / promptBlinkMs) % 2 === 0;
+  if (visible) {
+    ctx.fillStyle = '#1c1b19';
+    ctx.font = "bold 13px 'Space Mono', monospace";
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(textBootLine1, W / 2, H / 2 + 10);
+    ctx.fillText(textBootLine2, W / 2, H / 2 + 28);
+  }
+}
+
+function drawFallingScreen(t) {
+  if (fallStartTime === null) fallStartTime = t;
+  const elapsed = t - fallStartTime;
+  const progress = Math.min(1, elapsed / fallDurationMs);
+
+  const bgT = smoothstep(progress);
+  ctx.fillStyle = lerpColor('#c9dcef', eggScreenBgColor, bgT); // boot-screen blue easing into the loop's background
+  ctx.fillRect(0, 0, W, H);
+
+  drawCloudsZoomFade(t, progress);
+
+  // Egg fades in at its normal resting spot near the very end of the
+  // transition, timed so it reaches full opacity exactly as the loop begins.
+  const revealStart = Math.max(0, fallDurationMs - eggFadeDurationMs);
+  let eggAlpha = 0;
+  if (elapsed > revealStart) {
+    eggAlpha = Math.min(1, (elapsed - revealStart) / Math.max(1, eggFadeDurationMs));
+  }
+
+  if (eggAlpha > 0) {
+    const useImg = normalImg || placeholderNormal;
+    ctx.save();
+    ctx.globalAlpha = eggAlpha;
+    ctx.translate(centerX, baseY);
+    ctx.drawImage(useImg, -eggBaseW / 2, -eggBaseH, eggBaseW, eggBaseH);
+    ctx.restore();
+  }
+
+  if (progress >= 1) {
+    appState = 'loop';
+    phaseIndex = 0;
+    phaseStartTime = t;
+    loopEnterTime = t;
+    pauseBtn.style.display = 'none'; // nothing to press once the egg loop is running
+  }
+}
+
+// --- Crack overlay, drawn on top of the egg once it's been looping a while ---
+// Each crack is a jagged polyline defined in fractions of the egg's own
+// width/height (0 = center, negative y = up toward the top), so it scales
+// naturally with eggBaseW/eggBaseH. Cracks reveal one at a time as
+// severity climbs from 0 (just started) to 1 (fully cracked).
+const CRACK_LINES = [
+  [[0.02, -0.9], [-0.04, -0.65], [0.05, -0.4], [-0.02, -0.15], [0.06, -0.05]],
+  [[-0.05, -0.55], [-0.22, -0.4], [-0.15, -0.2]],
+  [[0.08, -0.3], [0.28, -0.15], [0.2, -0.05]],
+];
+
+function drawCracks(w, h, severity, yOffset = 0) {
+  if (severity <= 0) return;
+  const n = CRACK_LINES.length;
+  ctx.strokeStyle = eggOutlineColor;
+  ctx.lineJoin = 'round';
+  ctx.lineCap = 'round';
+
+  CRACK_LINES.forEach((line, i) => {
+    // Each crack gets its own slice of the overall severity range, so
+    // they appear one after another rather than all fading in together.
+    const reveal = Math.max(0, Math.min(1, (severity - i / n) * n));
+    if (reveal <= 0) return;
+
+    ctx.globalAlpha = Math.min(1, reveal * 1.5);
+    ctx.lineWidth = 1; // finer stroke
+
+    const pointsToShow = Math.max(2, Math.round(line.length * reveal));
+    const pts = line.slice(0, pointsToShow).map(([fx, fy]) => [fx * w, fy * h + yOffset]);
+
+    // Smooth quadratic curve through the points instead of sharp zigzag
+    // segments, so corners read as rounded rather than jagged.
+    ctx.beginPath();
+    ctx.moveTo(pts[0][0], pts[0][1]);
+    for (let k = 1; k < pts.length - 1; k++) {
+      const mx = (pts[k][0] + pts[k + 1][0]) / 2;
+      const my = (pts[k][1] + pts[k + 1][1]) / 2;
+      ctx.quadraticCurveTo(pts[k][0], pts[k][1], mx, my);
+    }
+    if (pts.length > 1) {
+      const last = pts[pts.length - 1];
+      ctx.lineTo(last[0], last[1]);
+    }
+    ctx.stroke();
+  });
+  ctx.globalAlpha = 1;
+}
+
+function drawHatchingScreen(t) {
+  if (hatchStartTime === null) hatchStartTime = t;
+  const elapsed = t - hatchStartTime;
+  const progress = Math.min(1, elapsed / HATCH_DURATION_MS);
+  const eased = easeOutCubic(progress);
+
+  ctx.fillStyle = creatureScreenBgColor;
+  ctx.fillRect(0, 0, W, H);
+
+  // Creature pops in underneath the shards, scaling up from slightly
+  // small to full size as the shell clears away.
+  const creatureScale = 0.6 + 0.4 * eased;
+  ctx.save();
+  ctx.translate(centerX, baseY);
+  ctx.scale(creatureScale, creatureScale);
+  drawCreatureBody(0); // 0 = no blink, no breathing yet, just the reveal pose
+  ctx.restore();
+
+  // Eggshell shards burst outward from center and spin as they fly off.
+  const shardCount = 8;
+  const maxDistance = Math.max(W, H) * 0.8;
+  const distance = maxDistance * eased;
+  const shardAlpha = 1 - Math.max(0, (progress - 0.7) / 0.3); // fade out near the end
+
+  ctx.fillStyle = '#f7f2e6';
+  ctx.strokeStyle = '#3a2c22';
+  ctx.lineWidth = 1;
+  ctx.globalAlpha = shardAlpha;
+
+  for (let i = 0; i < shardCount; i++) {
+    const angle = (i / shardCount) * Math.PI * 2;
+    const sx = centerX + Math.cos(angle) * distance;
+    const sy = (baseY - eggBaseH / 2) + Math.sin(angle) * distance;
+    const spin = angle + progress * Math.PI * 3;
+    const size = 10 + (i % 3) * 4;
+
+    ctx.save();
+    ctx.translate(sx, sy);
+    ctx.rotate(spin);
+    ctx.beginPath();
+    ctx.moveTo(0, -size);
+    ctx.lineTo(size * 0.7, size * 0.5);
+    ctx.lineTo(-size * 0.7, size * 0.5);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+    ctx.restore();
+  }
+  ctx.globalAlpha = 1;
+
+  if (progress >= 1) {
+    appState = 'creature';
+    creatureEnterTime = t;
+    creatureBornAt = Date.now();
+    lastFedAt = Date.now();
+    nextBlinkAt = t + 2000 + Math.random() * 2500;
+    blinkStartAt = null;
+    poops = [];
+    nextPoopSpawnAt = Date.now() + poopAfterMs;
+    phaseIndex = 0;
+    phaseStartTime = t;
+    pauseBtn.style.display = 'none'; // no pause anymore once the creature is here
+    breatheBtn.style.display = 'inline-block';
+    feedBtn.style.display = 'inline-block';
+  }
+}
+
+const CREATURE_BODY_W = 76, CREATURE_BODY_H = 66;
+
+let creatureColorNormal = '#3936ff';
+let creatureColorSick = '#2bff9c';
+let creatureOutlineNormal = '#222099';
+let creatureOutlineSick = '#1a995e';
+let isSick = false;
+let creatureBornAt = null; // real Date.now() timestamp - drives real-time persistence
+
+// Darkens a hex color by a given fraction, used to derive each body's
+// outline stroke color automatically from whatever fill color is picked,
+// instead of needing a separate stroke-color input.
+function darkenHex(hex, amount) {
+  const num = parseInt(hex.slice(1), 16);
+  const r = Math.max(0, Math.round(((num >> 16) & 255) * (1 - amount)));
+  const g = Math.max(0, Math.round(((num >> 8) & 255) * (1 - amount)));
+  const b = Math.max(0, Math.round((num & 255) * (1 - amount)));
+  return `rgb(${r},${g},${b})`;
+}
+
+bindColor('creatureColorNormal', 'creatureColorNormalVal', v => creatureColorNormal = v);
+bindColor('creatureColorSick', 'creatureColorSickVal', v => creatureColorSick = v);
+bindColor('creatureOutlineNormal', 'creatureOutlineNormalVal', v => creatureOutlineNormal = v);
+bindColor('creatureOutlineSick', 'creatureOutlineSickVal', v => creatureOutlineSick = v);
+bindSlider('birthPromptW', 'birthPromptWVal', v => birthPromptW = v, v => v.toFixed(0) + 'px');
+bindSlider('birthPromptH', 'birthPromptHVal', v => birthPromptH = v, v => v.toFixed(0) + 'px');
+bindSlider('birthPromptRadius', 'birthPromptRadiusVal', v => birthPromptRadius = v, v => v.toFixed(0) + 'px');
+bindColor('birthPromptFillColor', 'birthPromptFillColorVal', v => birthPromptFillColor = v);
+bindColor('birthPromptTextColor', 'birthPromptTextColorVal', v => birthPromptTextColor = v);
+
+// Draws the creature's body, eyes, and (optionally) a blink, relative to
+// the current transform origin. blinkAmount: 0 = eyes fully open, 1 = fully
+// shut. centerPivot: false (default) means the origin sits at the body's
+// base/feet; true means the origin sits at the body's vertical center
+// (used for the roll, so it spins around its middle instead of its feet).
+// customW/customH override the default body size - used by the breathing
+// exercise to morph the body into a circle of any radius. mouthOpen: 0 =
+// normal small smile, 1 = wide open (used while feeding). Color, eyes, and
+// a thermometer all switch automatically based on the global isSick flag.
+function drawCreatureBody(blinkAmount, centerPivot = false, customW = null, customH = null, mouthOpen = 0) {
+  const bodyW = customW || CREATURE_BODY_W, bodyH = customH || CREATURE_BODY_H;
+  const yShift = centerPivot ? bodyH / 2 : 0;
+
+  ctx.fillStyle = isSick ? creatureColorSick : creatureColorNormal;
+  ctx.beginPath();
+  ctx.ellipse(0, -bodyH / 2 + yShift, bodyW / 2, bodyH / 2, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = isSick ? creatureOutlineSick : creatureOutlineNormal;
+  ctx.lineWidth = 2;
+  ctx.stroke();
+
+  // Eyes: normal blinking ovals, or droopy half-lidded ones with under-eye
+  // bags while sick (a clearer "unwell" read than X's, which look more
+  // like "knocked out").
+  const eyeY = -bodyH * 0.62 + yShift;
+  const eyeSpacing = 16;
+  const eyeW = 12;
+  const eyeH = Math.max(1, 14 * (1 - blinkAmount));
+
+  if (isSick) {
+    [-1, 1].forEach(side => {
+      const ex = side * eyeSpacing;
+
+      // flattened white of the eye, mostly closed
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.ellipse(ex, eyeY, eyeW / 2, 3, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = '#3a2c22';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+
+      // small dark pupil peeking through
+      ctx.fillStyle = '#1c1b19';
+      ctx.beginPath();
+      ctx.ellipse(ex, eyeY, 2.5, 1.6, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // droopy eyelid curving down over the top
+      ctx.strokeStyle = '#1c1b19';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(ex - 6, eyeY - 1);
+      ctx.quadraticCurveTo(ex, eyeY - 5, ex + 6, eyeY - 1);
+      ctx.stroke();
+
+      // small under-eye bag
+      ctx.strokeStyle = '#8a8a8a';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.arc(ex, eyeY + 5, 4, 0.1 * Math.PI, 0.9 * Math.PI);
+      ctx.stroke();
+    });
+  } else {
+    [-1, 1].forEach(side => {
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.ellipse(side * eyeSpacing, eyeY, eyeW / 2, eyeH / 2, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = '#3a2c22';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+
+      if (blinkAmount < 0.7) {
+        ctx.fillStyle = '#1c1b19';
+        ctx.beginPath();
+        ctx.ellipse(side * eyeSpacing, eyeY, 4, Math.max(0.5, 4 * (1 - blinkAmount)), 0, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    });
+  }
+
+  // Mouth: round open "O" while sick (so the thermometer looks held in
+  // it), a wide open cartoony oval while feeding, or a small smile at rest.
+  const mouthY = -bodyH * 0.42 + yShift;
+  if (isSick) {
+    ctx.fillStyle = '#3a2c22';
+    ctx.beginPath();
+    ctx.arc(0, mouthY, 4.5, 0, Math.PI * 2);
+    ctx.fill();
+  } else if (mouthOpen > 0.02) {
+    const mw = 5 + 9 * mouthOpen, mh = 3 + 10 * mouthOpen;
+    ctx.fillStyle = '#7a3b2e';
+    ctx.beginPath();
+    ctx.ellipse(0, mouthY + mh * 0.3, mw / 2, mh / 2, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = '#3a2c22';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+  } else {
+    ctx.strokeStyle = '#3a2c22';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.arc(0, mouthY, 6, 0.15 * Math.PI, 0.85 * Math.PI);
+    ctx.stroke();
+  }
+
+  // Thermometer sticking out of the mouth, only while sick. The stick's
+  // open end sits exactly at the mouth (so it looks held/bitten there);
+  // the bulb sits at the far tip, away from the mouth. Rotated down-left.
+  if (isSick) {
+    ctx.save();
+    ctx.translate(0, mouthY);
+    ctx.rotate(Math.PI * 1.25); // down-left
+    ctx.fillStyle = '#f2ede2';
+    ctx.strokeStyle = '#8a8a8a';
+    ctx.lineWidth = 1;
+    roundRectPath(ctx, -2, -20, 4, 20, 2);
+    ctx.fill();
+    ctx.stroke();
+    ctx.fillStyle = '#e0483e';
+    ctx.beginPath();
+    ctx.arc(0, -20, 3.5, 0, Math.PI * 2); // bulb at the far tip, away from the mouth
+    ctx.fill();
+    ctx.strokeStyle = '#e0483e';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(0, -16);
+    ctx.lineTo(0, -6);
+    ctx.stroke();
+    ctx.restore();
+  }
+}
+
+// One round of box breathing: inhale 4s, hold 4s, exhale 4s, hold 4s,
+// repeated breathCycles times. The body contracts into a small circle on
+// each inhale, holds, expands into a larger circle on each exhale, holds
+// again, then after the final round eases back into its normal oval shape
+// and size before handing control back to the regular idle loop.
+let breathCycles = 3;
+let breathCircleY = 78; // fixed screen position, independent of baseY
+let breathTextY = H - 12;
+
+bindSlider('breathCycles', 'breathCyclesVal', v => breathCycles = v, v => v.toFixed(0));
+bindSlider('breathCircleY', 'breathCircleYVal', v => breathCircleY = v, v => v + 'px');
+bindSlider('breathTextY', 'breathTextYVal', v => breathTextY = v, v => v + 'px');
+
+// Feeding: the creature tilts its head back and opens its mouth wide,
+// a few sparkles fall from above and disappear into its mouth one at a
+// time, then the mouth closes and head returns to normal - handing off
+// into the same happy-dance reward used after cleaning.
+// DREAM: one answer per pulse; three connections reveal a temporary orbit.
+const DREAM_PERIOD = 2800;
+const DREAM_TRAVEL = 2000;
+const DREAM_WINDOW = 250;
+let dreamStartedAt = 0;
+let dreamAnsweredCycle = -1;
+let dreamConnections = 0;
+let dreamReply = null;
+let dreamOrbitAt = null;
+
+function answerDream(now = performance.now()) {
+  if (appState !== 'dream') return;
+  const elapsed = Math.max(0, now - dreamStartedAt);
+  const cycle = Math.floor(elapsed / DREAM_PERIOD);
+  if (dreamAnsweredCycle === cycle) return;
+  dreamAnsweredCycle = cycle;
+  const connected = Math.abs(elapsed % DREAM_PERIOD - DREAM_TRAVEL) <= DREAM_WINDOW;
+  dreamReply = { at: now, connected };
+  if (connected) {
+    dreamConnections++;
+    if (dreamConnections === 3) {
+      dreamOrbitAt = now;
+      dreamConnections = 0;
+    }
+  }
+}
+function enterDream() {
+  if (appState !== 'creature') return;
+  closeActionMenu();
+  statsScreenOpen = false;
+  birthChartScreenOpen = false;
+  dreamStartedAt = performance.now();
+  dreamAnsweredCycle = -1;
+  dreamConnections = 0;
+  dreamReply = null;
+  dreamOrbitAt = null;
+  appState = 'dream';
+  [pauseBtn, feedBtn, breatheBtn, cleanBtn, healBtn].forEach(btn => btn.style.display = 'none');
+}
+
+function exitDream() {
+  appState = 'creature';
+  lastInteractionAt = lastT;
+  feedBtn.style.display = 'inline-block';
+  breatheBtn.style.display = 'inline-block';
+  cleanBtn.style.display = poops.length > 0 ? 'inline-block' : 'none';
+  healBtn.style.display = isSick ? 'inline-block' : 'none';
+  actionMenuOpen = true;
+  actionMenuIndex = ACTION_MENU.findIndex(item => item.action === 'dream');
+  actionMenuOpenedAt = lastT;
+}
+
+function drawDreamScreen(t) {
+  const elapsed = Math.max(0, t - dreamStartedAt);
+  const phase = elapsed % DREAM_PERIOD;
+  const cy = H / 2 - 2;
+  const target = CREATURE_BODY_W / 2 + 3;
+  const replyAge = dreamReply ? t - dreamReply.at : Infinity;
+  const response = dreamReply && dreamReply.connected ? Math.max(0, 1 - replyAge / 900) : 0;
+  const orbitAge = dreamOrbitAt === null ? Infinity : t - dreamOrbitAt;
+  const orbit = orbitAge < 4500 ? Math.min(1, orbitAge / 500, (4500 - orbitAge) / 900) : 0;
+  ctx.save();
+  ctx.fillStyle = creatureScreenBgColor;
+  ctx.fillRect(0, 0, W, H);
+  ctx.strokeStyle = eggOutlineColor;
+  ctx.fillStyle = eggOutlineColor;
+  ctx.lineWidth = 1;
+
+  // A faint contact guide keeps the timing legible without a score display.
+  ctx.globalAlpha = 0.16;
+  ctx.beginPath();
+  ctx.arc(W / 2, cy, target, 0, Math.PI * 2);
+  ctx.stroke();
+  if (phase <= DREAM_TRAVEL + DREAM_WINDOW) {
+    const radius = target + 32 * (1 - phase / DREAM_TRAVEL);
+    ctx.globalAlpha = Math.abs(phase - DREAM_TRAVEL) <= DREAM_WINDOW ? 0.8 : 0.4;
+    ctx.beginPath();
+    ctx.arc(W / 2, cy, radius, 0, Math.PI * 2);
+    ctx.stroke();
+  }
+
+  // Connected replies expand from the ghost; missed replies drift away.
+  if (replyAge >= 0 && replyAge < 1100) {
+    const p = replyAge / 1100;
+    ctx.globalAlpha = (1 - p) * (dreamReply.connected ? 0.8 : 0.3);
+    ctx.beginPath();
+    ctx.arc(W / 2 + (dreamReply.connected ? 0 : p * 60), cy - (dreamReply.connected ? 0 : p * 20), target + p * 26, 0, Math.PI * 2);
+    ctx.stroke();
+  }
+  for (let i = 0; i < 9; i++) {
+    const a = i * Math.PI * 2 / 9 + elapsed / 4500;
+    const drift = 8 * Math.sin(elapsed / 1600 + i * 2);
+    const radius = 58 + drift * (1 - orbit);
+    ctx.globalAlpha = 0.25 + orbit * 0.55;
+    ctx.beginPath();
+    ctx.arc(W / 2 + Math.cos(a) * radius, cy + Math.sin(a) * radius * 0.8, 1.3 + orbit * 0.5, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  if (orbit > 0) {
+    ctx.globalAlpha = orbit * 0.35;
+    ctx.beginPath();
+    ctx.ellipse(W / 2, cy, 58, 46.4, 0, 0, Math.PI * 2);
+    ctx.stroke();
+  }
+  ctx.globalAlpha = 1;
+  ctx.save();
+  ctx.translate(W / 2, cy - Math.sin(Math.min(1, replyAge / 900) * Math.PI) * response * 6);
+  ctx.scale(1 + response * 0.04, 1 - response * 0.04);
+  drawCreatureBody(1 - response * 0.7, true);
+  ctx.restore();
+  ctx.fillStyle = eggOutlineColor;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.font = "11px 'Space Mono', monospace";
+  ctx.fillText('DREAM', W / 2, 15);
+  ctx.font = "9px 'Space Mono', monospace";
+  const message = orbit > 0 ? 'a shared rhythm' : response > 0 ? 'it answers' : 'A: meet the ring';
+  ctx.fillText(message, W / 2, H - 28);
+  ctx.globalAlpha = 0.65;
+  ctx.fillText('B: return', W / 2, H - 13);
+  ctx.restore();
+}
+
+function drawFeedingScreen(t) {
+  ctx.fillStyle = creatureScreenBgColor;
+  ctx.fillRect(0, 0, W, H);
+
+  const elapsed = t - feedingStartTime;
+  const progress = Math.min(1, elapsed / FEED_DURATION_MS);
+
+  let mouthOpen, tiltRad;
+  if (progress < FEED_OPEN_FRAC) {
+    const p = smoothstep(progress / FEED_OPEN_FRAC);
+    mouthOpen = p;
+    tiltRad = -FEED_TILT_DEG * p * Math.PI / 180;
+  } else if (progress < 1 - FEED_CLOSE_FRAC) {
+    mouthOpen = 1;
+    tiltRad = -FEED_TILT_DEG * Math.PI / 180;
+  } else {
+    const p = smoothstep((progress - (1 - FEED_CLOSE_FRAC)) / FEED_CLOSE_FRAC);
+    mouthOpen = 1 - p;
+    tiltRad = -FEED_TILT_DEG * (1 - p) * Math.PI / 180;
+  }
+
+  ctx.save();
+  ctx.translate(centerX, baseY);
+  ctx.rotate(tiltRad);
+  drawCreatureBody(0, false, null, null, mouthOpen);
+  ctx.restore();
+
+  // Sparkles fall from above the screen down to the mouth, staggered so
+  // they arrive one after another rather than all landing at once.
+  const eatStart = FEED_OPEN_FRAC, eatEnd = 1 - FEED_CLOSE_FRAC;
+  const eatSpan = eatEnd - eatStart;
+  const mouthTargetY = baseY - CREATURE_BODY_H * 0.42;
+
+  for (let i = 0; i < FEED_SPARKLE_COUNT; i++) {
+    const startFrac = eatStart + (i / FEED_SPARKLE_COUNT) * eatSpan * 0.8;
+    const durFrac = (eatSpan / FEED_SPARKLE_COUNT) * 1.4;
+    const localP = (progress - startFrac) / durFrac;
+    if (localP >= 0 && localP <= 1) {
+      const eased = smoothstep(Math.min(1, localP));
+      const startY = -20;
+      const y = startY + (mouthTargetY - startY) * eased;
+      const x = centerX + Math.sin(localP * Math.PI * 2 + i) * 6;
+      const alpha = localP < 0.85 ? 1 : 1 - (localP - 0.85) / 0.15; // fades right as it's "eaten"
+      drawSparkle(x, y, 5, alpha, t / 150 + i);
+    }
+  }
+
+  if (progress >= 1) {
+    appState = 'creature';
+    happyUntil = t + HAPPY_DURATION_MS;
+    feedBtn.disabled = false;
+    lastInteractionAt = null; // idle clock restarts fresh once truly back to idle
+  }
+}
+
+function drawBreathingScreen(t) {
+  ctx.fillStyle = creatureScreenBgColor;
+  ctx.fillRect(0, 0, W, H);
+
+  const elapsed = t - breathingStartTime;
+  const baseHalfW = CREATURE_BODY_W / 2, baseHalfH = CREATURE_BODY_H / 2;
+  const baseRadius = (baseHalfW + baseHalfH) / 2;
+  const cycleMs = BREATH_STEP_MS * 4;
+  const totalMs = cycleMs * breathCycles;
+
+  let rx, ry, label;
+
+  if (elapsed < totalMs) {
+    const withinCycle = elapsed % cycleMs;
+    const cycleIndex = Math.floor(elapsed / cycleMs);
+    // The first inhale starts from the resting body (scale 1.0); every
+    // inhale after that actually starts from wherever the previous
+    // cycle's hold-after-exhale left it (scale 1.3), not from 1.0 - using
+    // the wrong start value here is what caused the snap-then-shrink.
+    const inhaleStart = cycleIndex === 0 ? 1.0 : 1.3;
+
+    if (withinCycle < BREATH_STEP_MS) {
+      // Inhale: contract smoothly from wherever it actually is.
+      const p = smoothstep(withinCycle / BREATH_STEP_MS);
+      const scale = inhaleStart - (inhaleStart - 0.7) * p;
+      rx = ry = baseRadius * scale;
+      label = textBreatheInhale;
+
+    } else if (withinCycle < BREATH_STEP_MS * 2) {
+      rx = ry = baseRadius * 0.7;
+      label = textBreatheHold;
+
+    } else if (withinCycle < BREATH_STEP_MS * 3) {
+      // Exhale: expand from the small circle up to a larger one.
+      const p = smoothstep((withinCycle - BREATH_STEP_MS * 2) / BREATH_STEP_MS);
+      const scale = 0.7 + 0.6 * p;
+      rx = ry = baseRadius * scale;
+      label = textBreatheExhale;
+
+    } else {
+      rx = ry = baseRadius * 1.3;
+      label = textBreatheHold;
+    }
+
+  } else if (elapsed < totalMs + BREATH_RETURN_MS) {
+    // Ease back from the expanded circle into the normal oval body.
+    const p = smoothstep((elapsed - totalMs) / BREATH_RETURN_MS);
+    const startR = baseRadius * 1.3;
+    rx = startR + (baseHalfW - startR) * p;
+    ry = startR + (baseHalfH - startR) * p;
+    label = '';
+
+  } else {
+    appState = 'creature';
+    phaseIndex = 0;
+    phaseStartTime = t;
+    breatheBtn.disabled = false;
+    lastInteractionAt = null; // idle clock restarts fresh once truly back to idle
+    return;
+  }
+
+  // Fixed, screen-centered position (not tied to the ground line baseY
+  // the way the normal idle body is) so the circle never drifts.
+  ctx.save();
+  ctx.translate(centerX, breathCircleY);
+  drawCreatureBody(0, true, rx * 2, ry * 2);
+  ctx.restore();
+
+  if (label) {
+    ctx.fillStyle = '#1c1b19';
+    ctx.font = "bold 15px 'Manrope', sans-serif";
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'alphabetic';
+    ctx.fillText(label, W / 2, breathTextY);
+  }
+}
+
+// Death screen: a floating ghost with X eyes, gently bobbing. Reboot
+// (Resurrect) is the only way out from here.
+function drawDeadScreen(t) {
+  ctx.fillStyle = creatureScreenBgColor;
+  ctx.fillRect(0, 0, W, H);
+
+  const floatY = Math.sin(t / 500) * 6;
+  const driftX = Math.sin(t / 700) * 3;
+  const alpha = 0.75 + 0.15 * Math.sin(t / 900);
+
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  ctx.translate(centerX + deathGhostX + driftX, baseY + deathGhostY - CREATURE_BODY_H / 2 + floatY);
+
+  const w = CREATURE_BODY_W, h = CREATURE_BODY_H;
+  ctx.fillStyle = deathGhostFillColor;
+  ctx.strokeStyle = darkenHex(deathGhostFillColor, 0.15);
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.arc(0, -h * 0.15, w / 2, Math.PI, 0, false); // rounded dome top
+  ctx.lineTo(w / 2, h * 0.4);
+  const bumps = 3, bumpW = w / bumps;
+  for (let i = 0; i < bumps; i++) {
+    const xStart = w / 2 - i * bumpW;
+    const xMid = xStart - bumpW / 2;
+    const xEnd = xStart - bumpW;
+    ctx.quadraticCurveTo(xMid, h * 0.4 + 10, xEnd, h * 0.4);
+  }
+  ctx.closePath();
+  ctx.fill();
+  ctx.stroke();
+
+  // X eyes
+  const eyeY = -h * 0.25;
+  ctx.strokeStyle = deathEyeColor;
+  ctx.lineWidth = 2;
+  [-1, 1].forEach(side => {
+    const ex = side * 16;
+    ctx.beginPath();
+    ctx.moveTo(ex - 5, eyeY - 5); ctx.lineTo(ex + 5, eyeY + 5);
+    ctx.moveTo(ex - 5, eyeY + 5); ctx.lineTo(ex + 5, eyeY - 5);
+    ctx.stroke();
+  });
+
+  ctx.restore();
+
+  ctx.fillStyle = deathTextColor;
+  ctx.font = "bold 13px 'Space Mono', monospace";
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'top';
+  ctx.fillText(textDeathMessage, W / 2, deathTextY);
+}
+
+// Screensaver: just the eyes and mouth, blown up to fill the whole
+// screen, cycling through a few expressions. Exits on any interaction
+// (canvas tap or the Wake up button).
+let screensaverNextBlinkAt = null;
+let screensaverBlinkStartAt = null;
+
+function drawScreensaverScreen(t) {
+  ctx.fillStyle = creatureScreenBgColor;
+  ctx.fillRect(0, 0, W, H);
+
+  if (screensaverNextBlinkAt === null) screensaverNextBlinkAt = t + 1500;
+  if (screensaverNextBlinkAt !== null && t >= screensaverNextBlinkAt && screensaverBlinkStartAt === null) {
+    screensaverBlinkStartAt = t;
+  }
+  let blinkAmount = 0;
+  if (screensaverBlinkStartAt !== null) {
+    const bp = (t - screensaverBlinkStartAt) / BLINK_DURATION_MS;
+    if (bp >= 1) {
+      screensaverBlinkStartAt = null;
+      screensaverNextBlinkAt = t + 2000 + Math.random() * 2500;
+    } else {
+      blinkAmount = Math.sin(bp * Math.PI);
+    }
+  }
+
+  const expressions = ['happy', 'surprised', 'sleepy', 'wink'];
+  const cycleMs = 3500;
+  const expr = expressions[Math.floor(t / cycleMs) % expressions.length];
+
+  const cx = centerX, cy = H / 2 - 12;
+  const eyeSpacing = 55, eyeR = 32;
+
+  [-1, 1].forEach(side => {
+    const ex = cx + side * eyeSpacing;
+    let closed = blinkAmount;
+    if (expr === 'sleepy') closed = Math.max(closed, 0.6);
+    if (expr === 'wink' && side === 1) closed = 1;
+    const eyeH = Math.max(3, eyeR * 2 * (1 - closed * 0.9));
+
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath();
+    ctx.ellipse(ex, cy, eyeR, eyeH / 2, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = '#1c1b19';
+    ctx.lineWidth = 3;
+    ctx.stroke();
+
+    if (closed < 0.7) {
+      const pupilR = expr === 'surprised' ? eyeR * 0.55 : eyeR * 0.4;
+      ctx.fillStyle = '#1c1b19';
+      ctx.beginPath();
+      ctx.ellipse(ex, cy, pupilR, pupilR * (1 - closed), 0, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  });
+
+  const my = cy + eyeR + 34;
+  ctx.strokeStyle = '#1c1b19';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  if (expr === 'happy') {
+    ctx.arc(cx, my - 10, 28, 0.1 * Math.PI, 0.9 * Math.PI);
+    ctx.stroke();
+  } else if (expr === 'surprised') {
+    ctx.fillStyle = '#7a3b2e';
+    ctx.ellipse(cx, my, 14, 18, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+  } else if (expr === 'sleepy') {
+    ctx.fillStyle = '#7a3b2e';
+    ctx.ellipse(cx, my, 8, 5, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+  } else {
+    ctx.moveTo(cx - 20, my);
+    ctx.quadraticCurveTo(cx, my - 14, cx + 20, my - 4);
+    ctx.stroke();
+  }
+}
+
+function exitScreensaver() {
+  if (!screensaverActive) return;
+  screensaverActive = false;
+  appState = 'creature';
+  lastInteractionAt = lastT;
+  screensaverNextBlinkAt = null;
+  screensaverBlinkStartAt = null;
+  wakeBtn.style.display = 'none';
+  breatheBtn.style.display = 'inline-block';
+  feedBtn.style.display = 'inline-block';
+  cleanBtn.style.display = poops.length > 0 ? 'inline-block' : 'none';
+  healBtn.style.display = isSick ? 'inline-block' : 'none';
+  phaseIndex = 0;
+  phaseStartTime = lastT;
+}
+
+const menuStyle = {};
+bindSlider('menuX', 'menuXVal', v => menuStyle.X = v, v => v + 'px');
+bindSlider('menuY', 'menuYVal', v => menuStyle.Y = v, v => v + 'px');
+bindSlider('menuPadding', 'menuPaddingVal', v => menuStyle.Padding = v, v => v + 'px');
+bindSlider('menuTextInset', 'menuTextInsetVal', v => menuStyle.TextInset = v, v => v + 'px');
+bindSlider('menuRowSpacing', 'menuRowSpacingVal', v => menuStyle.RowSpacing = v, v => v + 'px');
+bindSlider('menuRowHeight', 'menuRowHeightVal', v => menuStyle.RowHeight = v, v => v + 'px');
+bindSlider('menuRowsY', 'menuRowsYVal', v => menuStyle.RowsY = v, v => v + 'px');
+bindSlider('menuTitleY', 'menuTitleYVal', v => menuStyle.TitleY = v, v => v + 'px');
+bindSlider('menuFooterY', 'menuFooterYVal', v => menuStyle.FooterY = v, v => v + 'px');
+bindSlider('menuTitleSize', 'menuTitleSizeVal', v => menuStyle.TitleSize = v, v => v + 'px');
+bindSlider('menuLabelSize', 'menuLabelSizeVal', v => menuStyle.LabelSize = v, v => v + 'px');
+bindSlider('menuFooterSize', 'menuFooterSizeVal', v => menuStyle.FooterSize = v, v => v + 'px');
+bindSlider('menuTitleAlign', 'menuTitleAlignVal', v => menuStyle.TitleAlign = v, v => ['left','center','right'][v]);
+bindSlider('menuLabelAlign', 'menuLabelAlignVal', v => menuStyle.LabelAlign = v, v => ['left','center','right'][v]);
+bindSlider('menuFooterAlign', 'menuFooterAlignVal', v => menuStyle.FooterAlign = v, v => ['left','center','right'][v]);
+bindSlider('menuOpacity', 'menuOpacityVal', v => menuStyle.Opacity = v, v => v + '%');
+bindSlider('menuDisabledOpacity', 'menuDisabledOpacityVal', v => menuStyle.DisabledOpacity = v, v => v + '%');
+bindColor('menuBackground', 'menuBackgroundVal', v => menuStyle.Background = v);
+bindColor('menuTitleColor', 'menuTitleColorVal', v => menuStyle.TitleColor = v);
+bindColor('menuLabelColor', 'menuLabelColorVal', v => menuStyle.LabelColor = v);
+bindColor('menuSelectedBg', 'menuSelectedBgVal', v => menuStyle.SelectedBg = v);
+bindColor('menuSelectedText', 'menuSelectedTextVal', v => menuStyle.SelectedText = v);
+bindColor('menuFooterColor', 'menuFooterColorVal', v => menuStyle.FooterColor = v);
+bindText('menuTitle', v => menuStyle.Title = v);
+bindText('menuFooter', v => menuStyle.Footer = v);
+bindText('menuMarker', v => menuStyle.Marker = v);
+bindText('menufeed', v => menuStyle.feed = v);
+bindText('menubreathe', v => menuStyle.breathe = v);
+bindText('menulava', v => menuStyle.lava = v);
+bindText('menudream', v => menuStyle.dream = v);
+bindText('menuclean', v => menuStyle.clean = v);
+bindText('menuheal', v => menuStyle.heal = v);
+bindText('menustats', v => menuStyle.stats = v);
+bindText('menucancel', v => menuStyle.cancel = v);
+bindText('menubirthChart', v => menuStyle.birthChart = v);
+
+// Viewport state is separate from selection, so the highlight moves first.
+let actionMenuFirstRow = 0;
+let actionMenuScrollFrom = 0;
+let actionMenuScrollPosition = 0;
+let actionMenuScrollStartedAt = 0;
+
+function drawActionMenu() {
+  const st = menuStyle;
+  const aligns = ['left', 'center', 'right'];
+  const textX = alignment => alignment === 0 ? st.Padding + st.TextInset : alignment === 1 ? W / 2 : W - st.Padding - st.TextInset;
+  const textWidth = Math.max(1, W - 2 * (st.Padding + st.TextInset));
+  ctx.save();
+  ctx.globalAlpha = st.Opacity / 100;
+  ctx.fillStyle = st.Background;
+  ctx.fillRect(0, 0, W, H);
+  ctx.globalAlpha = 1;
+  ctx.translate(st.X, st.Y);
+  ctx.textBaseline = 'middle';
+  ctx.fillStyle = st.TitleColor;
+  ctx.font = `${st.TitleSize}px 'Space Mono', monospace`;
+  ctx.textAlign = aligns[st.TitleAlign];
+  ctx.fillText(st.Title, textX(st.TitleAlign), st.TitleY, textWidth);
+  // Clip rows so scrolling never draws over the heading or footer.
+  ctx.save();
+  ctx.beginPath();
+  const top = Math.max(st.TitleY + st.TitleSize / 2 + 3, st.RowsY - st.RowHeight / 2);
+  const bottom = st.FooterY - st.FooterSize - 4;
+  const halfRow = Math.max(st.RowHeight, st.LabelSize) / 2;
+  const visibleRows = Math.max(1, Math.floor((bottom - st.RowsY - halfRow) / st.RowSpacing) + 1);
+  let firstRow = actionMenuFirstRow;
+  if (actionMenuIndex < firstRow) firstRow = actionMenuIndex;
+  if (actionMenuIndex >= firstRow + visibleRows) firstRow = actionMenuIndex - visibleRows + 1;
+  firstRow = Math.max(0, Math.min(firstRow, Math.max(0, ACTION_MENU.length - visibleRows)));
+  if (actionMenuIndex === 0) {
+    // Opening or wrapping starts at the top without flying through the list.
+    actionMenuFirstRow = actionMenuScrollFrom = actionMenuScrollPosition = 0;
+    actionMenuScrollStartedAt = lastT;
+  } else {
+    if (firstRow !== actionMenuFirstRow) {
+      actionMenuScrollFrom = actionMenuScrollPosition;
+      actionMenuFirstRow = firstRow;
+      actionMenuScrollStartedAt = lastT;
+    }
+    const progress = Math.max(0, Math.min(1, (lastT - actionMenuScrollStartedAt) / 140));
+    const eased = 1 - Math.pow(1 - progress, 3);
+    actionMenuScrollPosition = actionMenuScrollFrom + (actionMenuFirstRow - actionMenuScrollFrom) * eased;
+  }
+  ctx.rect(0, top, W, Math.max(0, bottom - top));
+  ctx.clip();
+  ACTION_MENU.forEach((item, i) => {
+    const y = st.RowsY + (i - actionMenuScrollPosition) * st.RowSpacing;
+    const selected = i === actionMenuIndex;
+    ctx.globalAlpha = 1;
+    if (selected) {
+      ctx.fillStyle = st.SelectedBg;
+      ctx.fillRect(st.Padding, y - st.RowHeight / 2, W - 2 * st.Padding, st.RowHeight);
+    }
+    const unavailable = (item.action === 'clean' && poops.length === 0) || (item.action === 'heal' && !isSick);
+    ctx.globalAlpha = unavailable ? st.DisabledOpacity / 100 : 1;
+    ctx.fillStyle = selected ? st.SelectedText : st.LabelColor;
+    ctx.font = `${st.LabelSize}px 'Space Mono', monospace`;
+    ctx.textAlign = aligns[st.LabelAlign];
+    const label = menuStyle[item.action] ?? item.label;
+    ctx.fillText((selected && st.Marker ? st.Marker + ' ' : '') + label, textX(st.LabelAlign), y, textWidth);
+  });
+  ctx.restore();
+  ctx.globalAlpha = 1;
+  ctx.fillStyle = st.FooterColor;
+  ctx.font = `${st.FooterSize}px 'Space Mono', monospace`;
+  ctx.textAlign = aligns[st.FooterAlign];
+  ctx.textBaseline = 'bottom';
+  ctx.fillText(st.Footer, textX(st.FooterAlign), st.FooterY, textWidth);
+  ctx.restore();
+}
+const statsStyle = {};
+bindSlider('statsX', 'statsXVal', v => statsStyle.X = v, v => v + 'px');
+bindSlider('statsY', 'statsYVal', v => statsStyle.Y = v, v => v + 'px');
+bindSlider('statsPadding', 'statsPaddingVal', v => statsStyle.Padding = v, v => v + 'px');
+bindSlider('statsSpacing', 'statsSpacingVal', v => statsStyle.Spacing = v, v => v + 'px');
+bindSlider('statsTitleY', 'statsTitleYVal', v => statsStyle.TitleY = v, v => v + 'px');
+bindSlider('statsRowsY', 'statsRowsYVal', v => statsStyle.RowsY = v, v => v + 'px');
+bindSlider('statsLabelSize', 'statsLabelSizeVal', v => statsStyle.LabelSize = v, v => v + 'px');
+bindSlider('statsValueSize', 'statsValueSizeVal', v => statsStyle.ValueSize = v, v => v + 'px');
+bindSlider('statsTitleSize', 'statsTitleSizeVal', v => statsStyle.TitleSize = v, v => v + 'px');
+bindSlider('statsBarHeight', 'statsBarHeightVal', v => statsStyle.BarHeight = v, v => v + 'px');
+bindSlider('statsLabelAlign', 'statsLabelAlignVal', v => statsStyle.LabelAlign = v, v => ['left', 'center', 'right'][v]);
+bindSlider('statsValueAlign', 'statsValueAlignVal', v => statsStyle.ValueAlign = v, v => ['left', 'center', 'right'][v]);
+bindSlider('statsTitleAlign', 'statsTitleAlignVal', v => statsStyle.TitleAlign = v, v => ['left', 'center', 'right'][v]);
+bindColor('statsBackground', 'statsBackgroundVal', v => statsStyle.Background = v);
+bindColor('statsLabelColor', 'statsLabelColorVal', v => statsStyle.LabelColor = v);
+bindColor('statsValueColor', 'statsValueColorVal', v => statsStyle.ValueColor = v);
+bindColor('statsTitleColor', 'statsTitleColorVal', v => statsStyle.TitleColor = v);
+bindColor('statsSelectedBg', 'statsSelectedBgVal', v => statsStyle.SelectedBg = v);
+bindColor('statsSelectedText', 'statsSelectedTextVal', v => statsStyle.SelectedText = v);
+bindColor('statsBarColor', 'statsBarColorVal', v => statsStyle.BarColor = v);
+bindText('statsTitle', v => statsStyle.Title = v);
+bindText('statsHappiness', v => statsStyle.Happiness = v);
+bindText('statsFullness', v => statsStyle.Fullness = v);
+bindText('statsEnergy', v => statsStyle.Energy = v);
+bindText('statsAge', v => statsStyle.Age = v);
+bindText('statsFooter', v => statsStyle.Footer = v);
+
+function drawStatsScreen(t) {
+  if (creatureBornAt !== null) creatureAgeDays = Math.max(0, Math.floor((Date.now() - creatureBornAt) / 86400000));
+  const st = statsStyle;
+  const alignments = ['left', 'center', 'right'];
+  const xFor = (alignment, left, right) => alignment === 0 ? left : alignment === 1 ? (left + right) / 2 : right;
+  ctx.save();
+  ctx.fillStyle = st.Background;
+  ctx.fillRect(0, 0, W, H);
+  ctx.translate(st.X, st.Y);
+  ctx.textBaseline = 'middle';
+  ctx.fillStyle = st.TitleColor;
+  ctx.font = `${st.TitleSize}px 'Space Mono', monospace`;
+  ctx.textAlign = alignments[st.TitleAlign];
+  ctx.fillText(st.Title, xFor(st.TitleAlign, st.Padding, W - st.Padding), st.TitleY, W - 2 * st.Padding);
+  const rows = [
+    [st.Happiness, Math.round(happiness) + '%', happiness],
+    [st.Fullness, Math.round(hunger) + '%', hunger],
+    [st.Energy, Math.round(energy) + '%', energy],
+    [st.Age, creatureAgeDays + ' DAYS', null]
+  ];
+  const selected = statsScroll % rows.length;
+  // Scroll only as needed, keeping title/footer fixed and selected row visible.
+  const visible = Math.max(1, Math.floor((H - 25 - st.RowsY) / st.Spacing));
+  const first = Math.max(0, selected - visible + 1);
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(0, st.RowsY - 14, W, H - 25 - (st.RowsY - 14));
+  ctx.clip();
+  rows.forEach(([label, value, amount], i) => {
+    if (i < first) return;
+    const y = st.RowsY + (i - first) * st.Spacing;
+    const active = i === selected;
+    if (active) {
+      ctx.fillStyle = st.SelectedBg;
+      ctx.fillRect(st.Padding - 6, y - 13, W - st.Padding * 2 + 12, st.Spacing - 3);
+    }
+    const split = W * 0.64;
+    ctx.fillStyle = active ? st.SelectedText : st.LabelColor;
+    ctx.font = `${st.LabelSize}px 'Space Mono', monospace`;
+    ctx.textAlign = alignments[st.LabelAlign];
+    ctx.fillText(label, xFor(st.LabelAlign, st.Padding, split - 8), y, split - 8 - st.Padding);
+    ctx.fillStyle = active ? st.SelectedText : st.ValueColor;
+    ctx.font = `${st.ValueSize}px 'Space Mono', monospace`;
+    ctx.textAlign = alignments[st.ValueAlign];
+    ctx.fillText(value, xFor(st.ValueAlign, split, W - st.Padding), y, W - st.Padding - split);
+    if (amount !== null) {
+      ctx.strokeStyle = st.BarColor;
+      ctx.fillStyle = st.BarColor;
+      const width = W - 2 * st.Padding;
+      ctx.lineWidth = 1;
+      ctx.strokeRect(st.Padding, y + 12, width, st.BarHeight);
+      ctx.fillRect(st.Padding, y + 12, width * Math.max(0, Math.min(100, amount)) / 100, st.BarHeight);
+    }
+  });
+  ctx.restore();
+  ctx.fillStyle = st.TitleColor;
+  ctx.font = "9px 'Space Mono', monospace";
+  ctx.textAlign = 'center';
+  ctx.fillText(st.Footer, W / 2, H - 12, W - 16);
+  ctx.restore();
+}
+
+function drawBirthChartScreen() {
+  ctx.save();
+  ctx.fillStyle = '#111';
+  ctx.fillRect(0, 0, W, H);
+  ctx.fillStyle = '#d7cfbe';
+  ctx.font = "12px 'Space Mono', monospace";
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('BIRTH CHART', 18, 25);
+  ctx.font = "11px 'Space Mono', monospace";
+  const ageDays = creatureBornAt === null ? 0 : Math.max(0, Math.floor((Date.now() - creatureBornAt) / 86400000));
+  const rows = [
+    ['NAME', creatureName || 'Creature'],
+    ['AGE', ageDays + ' DAYS'],
+    ['SUN', 'PISCES ♓'],
+    ['MOON', 'SCORPIO ♏'],
+    ['ASCENDANT', 'ARIES ♈']
+  ];
+  rows.forEach(([label, value], index) => {
+    const y = 57 + index * 28;
+    ctx.fillText(label, 18, y);
+    ctx.fillText(value, 104, y, W - 122);
+  });
+  ctx.restore();
+}
+
+
+function drawCreatureScreen(t) {
+  if (lastInteractionAt === null) lastInteractionAt = t; // starts the idle clock fresh whenever the creature (re)appears
+
+  if (!actionMenuOpen && !screensaverActive && (t - lastInteractionAt) >= screensaverTriggerMs) {
+    screensaverActive = true;
+    appState = 'screensaver';
+    breatheBtn.style.display = 'none';
+    feedBtn.style.display = 'none';
+    healBtn.style.display = 'none';
+    cleanBtn.style.display = 'none';
+    wakeBtn.style.display = 'inline-block';
+    return;
+  }
+
+  ctx.fillStyle = creatureScreenBgColor;
+  ctx.fillRect(0, 0, W, H);
+
+  if (creatureName) {
+    ctx.fillStyle = '#8a8478';
+    ctx.font = "11px 'Space Mono', monospace";
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    ctx.fillText(creatureName, W / 2, 6);
+  }
+
+  // Blink scheduling runs independently of movement - the creature can
+  // blink mid-rock, mid-bounce, whenever its timer comes up.
+  let blinkAmount = 0;
+  if (nextBlinkAt !== null && t >= nextBlinkAt && blinkStartAt === null) {
+    blinkStartAt = t;
+  }
+  if (blinkStartAt !== null) {
+    const blinkElapsed = t - blinkStartAt;
+    const blinkProgress = blinkElapsed / BLINK_DURATION_MS;
+    if (blinkProgress >= 1) {
+      blinkStartAt = null;
+      nextBlinkAt = t + 2500 + Math.random() * 3000;
+    } else {
+      blinkAmount = Math.sin(blinkProgress * Math.PI); // quick close-and-open
+    }
+  }
+
+  // New poops spawn one at a time at random spots (away from the creature)
+  // on the configured interval, up to the configured max count. Uses
+  // real wall-clock time (Date.now()), not animation-frame time, so this
+  // keeps advancing correctly across the tab being backgrounded or closed
+  // and reopened later - see the save/restore section further down.
+  if (happyUntil === null && healUntil === null && nextPoopSpawnAt !== null && Date.now() >= nextPoopSpawnAt && poops.length < poopCountMax) {
+    poops.push(randomPoopPosition());
+
+happiness = Math.max(0, happiness - statRates.poopHappinessLoss);
+
+cleanBtn.style.display = 'inline-block';
+    nextPoopSpawnAt = poops.length < poopCountMax ? Date.now() + poopSpawnIntervalMs : null;
+    saveCreatureState();
+  }
+
+  // Sickness kicks in once the poop pile crosses the threshold, and stays
+  // until healed - checked as a one-time edge trigger so it doesn't refire
+  // every frame once already sick.
+  if (!isSick && poops.length >= sickThreshold) {
+    isSick = true;
+    happiness = 0;
+    sickStartedAt = Date.now();
+    healBtn.style.display = 'inline-block';
+    // Sick phase list is shorter (idle only) - reset so phaseIndex can't
+    // point past the end of it if sickness hit mid-rock or mid-bounce.
+    phaseIndex = 0;
+    phaseStartTime = t;
+    saveCreatureState();
+  }
+
+  // Death, after being sick for too long (real time, not animation time -
+  // same reasoning as the poop timers: this needs to be accurate even if
+  // the sickness started in a previous session).
+  if (isSick && sickStartedAt !== null && Date.now() - sickStartedAt >= deathAfterMs) {
+    appState = 'dead';
+    healBtn.style.display = 'none';
+    cleanBtn.style.display = 'none';
+    breatheBtn.style.display = 'none';
+    feedBtn.style.display = 'none';
+    saveCreatureState();
+    return;
+  }
+
+  // Heal-dance reward (hearts) plays after curing sickness, same mechanic
+  // as the happy dance.
+  if (healUntil !== null) {
+    if (t < healUntil) {
+      drawHealDance(t);
+      return;
+    } else {
+      healUntil = null;
+      phaseIndex = 0;
+      phaseStartTime = t;
+    }
+  }
+
+  // Happy-dance reward plays instead of the normal loop for a couple of
+  // seconds right after cleaning, then hands back to the regular sequence.
+  if (happyUntil !== null) {
+    if (t < happyUntil) {
+      drawHappyDance(t);
+      return;
+    } else {
+      happyUntil = null;
+      nextPoopSpawnAt = Date.now() + poopAfterMs; // first poop of the next cycle
+      phaseIndex = 0;
+      phaseStartTime = t;
+    }
+  }
+
+  // Same rock/idle/bounce/idle sequencer as the egg loop (minus the roll),
+  // reusing phaseIndex/phaseStartTime and the same tuning sliders, just
+  // driving the creature's shapes directly instead of a bitmap.
+  if (phaseStartTime === null) phaseStartTime = t;
+  const phases = isSick ? sickCreaturePhases() : creaturePhases();
+  let phase = phases[phaseIndex];
+  let elapsed = t - phaseStartTime;
+  if (elapsed > phase.duration) {
+    phaseIndex = (phaseIndex + 1) % phases.length;
+    phaseStartTime = t;
+    elapsed = 0;
+    phase = phases[phaseIndex];
+  }
+  const progress = phase.duration > 0 ? elapsed / phase.duration : 0;
+
+  let tiltRad = 0, bounceOffset = 0, squashY = 1;
+
+  if (phase.type === 'rock') {
+    const tailCycles = 0.5;
+    const totalCycles = phase.repeats + tailCycles;
+    const mainFraction = phase.repeats / totalCycles;
+    let envelope;
+    if (progress < mainFraction) {
+      envelope = 1;
+    } else {
+      const tailProgress = (progress - mainFraction) / (1 - mainFraction);
+      envelope = Math.cos(tailProgress * Math.PI / 2);
+    }
+    const angle = progress * totalCycles * Math.PI * 2;
+    tiltRad = (tiltAmpDeg * envelope * Math.sin(angle)) * Math.PI / 180;
+
+  } else if (phase.type === 'bounce') {
+    const anticipation = 0.12;
+    if (progress < anticipation) {
+      const ap = progress / anticipation;
+      const squashCurve = Math.sin(ap * Math.PI);
+      squashY = 1 - squishAmt * 0.6 * squashCurve;
+    } else {
+      const bp2 = (progress - anticipation) / (1 - anticipation);
+      const x_ = bp2 * phase.repeats * Math.PI;
+      const hopValue = Math.abs(Math.sin(x_));
+      const xLocal = x_ % Math.PI;
+      const landing = xLocal >= Math.PI / 2;
+      const squishing = landing && hopValue < (1 + squishThreshold);
+      bounceOffset = -bounceAmpPx * hopValue;
+      squashY = squishing ? (1 - squishAmt * 0.6) : 1;
+    }
+  }
+  // idle phases: everything stays at defaults (upright, resting, no offset)
+
+  // Gentle breathing on top of whatever the current phase is doing.
+  const breathe = 1 + 0.03 * Math.sin(t / 900);
+
+  ctx.save();
+  ctx.translate(centerX, baseY + bounceOffset);
+  ctx.rotate(tiltRad);
+  ctx.scale(1, breathe * squashY);
+  drawCreatureBody(blinkAmount);
+  ctx.restore();
+
+if (hunger <= 40) {
+
+  ctx.fillStyle = '#d7cfbe';
+
+  ctx.beginPath();
+  ctx.arc(centerX + 55, baseY + bounceOffset - 70, 22, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.fillStyle = '#1c1b19';
+
+  ctx.font = "16px sans-serif";
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+
+  ctx.fillText('🍗', centerX + 55, baseY + bounceOffset - 70);
+
+}
+
+poops.forEach(p => drawPoop(t, p.x, p.y, p.seed));
+
+  poops.forEach(p => drawPoop(t, p.x, p.y, p.seed));
+
+  if (actionMenuOpen) {
+    if (ACTION_MENU_TIMEOUT_MS > 0 && lastT - actionMenuOpenedAt >= ACTION_MENU_TIMEOUT_MS) {
+      closeActionMenu();
+    } else {
+      drawActionMenu();
+    }
+  }
+}
+
+// Picks a random spot on screen for a new poop, staying clear of a circle
+// around the creature and a margin from the screen edges. Falls back to
+// whatever position it found after a limited number of tries rather than
+// looping forever if the screen is nearly full of poops.
+function randomPoopPosition() {
+  const margin = 18;
+  const exclX = centerX, exclY = baseY - CREATURE_BODY_H / 2;
+  const exclRadius = 55;
+  let x, y, tries = 0;
+  do {
+    x = margin + Math.random() * (W - margin * 2);
+    y = margin + 24 + Math.random() * (H - margin * 2 - 24);
+    tries++;
+  } while (Math.hypot(x - exclX, y - exclY) < exclRadius && tries < 25);
+  return { x, y, seed: Math.random() * 10 };
+}
+
+// A small mound with a couple of wavy stink lines rising off it, sitting
+// wherever it landed until the Clean button is pressed. seed varies the
+// stink-line wobble phase so multiple poops don't animate in lockstep.
+function drawPoop(t, px, py, seed) {
+  ctx.save();
+  ctx.translate(px, py);
+
+  ctx.fillStyle = '#6b4a2f';
+  ctx.strokeStyle = '#3a2c1f';
+  ctx.lineWidth = 1.5;
+  [[0, -6, 11], [3, -15, 8], [-2, -21, 6]].forEach(([ox, oy, r]) => {
+    ctx.beginPath();
+    ctx.ellipse(ox, oy, r, r * 0.8, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+  });
+
+  ctx.strokeStyle = '#8a8a8a';
+  ctx.lineWidth = 1.5;
+  for (let i = -1; i <= 1; i++) {
+    const bx = i * 9;
+    const wobble = Math.sin(t / 200 + seed + i * 2) * 3;
+    ctx.beginPath();
+    ctx.moveTo(bx, -26);
+    ctx.quadraticCurveTo(bx + wobble, -36, bx, -46);
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+
+// Quick squishy bounce-dance with sparkles radiating outward, played once
+// right after the poop is cleaned up.
+function drawHappyDance(t) {
+  const elapsed = HAPPY_DURATION_MS - (happyUntil - t);
+  const p = elapsed / HAPPY_DURATION_MS;
+
+  const bounceOffset = -8 * Math.abs(Math.sin(elapsed / 150));
+  const wiggleDeg = 8 * Math.sin(elapsed / 120);
+  const squashY = 1 - 0.15 * Math.abs(Math.sin(elapsed / 150));
+
+  ctx.save();
+  ctx.translate(centerX, baseY + bounceOffset);
+  ctx.rotate(wiggleDeg * Math.PI / 180);
+  ctx.scale(1, squashY);
+  drawCreatureBody(0); // eyes open throughout - it's happy!
+  ctx.restore();
+
+  const sparkleCount = 6;
+  const fadeEnvelope = Math.sin(Math.min(1, p) * Math.PI); // fades in, then out
+  for (let i = 0; i < sparkleCount; i++) {
+    const angle = (i / sparkleCount) * Math.PI * 2 + elapsed / 300;
+    const dist = 45 + 10 * Math.sin(elapsed / 200 + i);
+    const sx = centerX + Math.cos(angle) * dist;
+    const sy = (baseY - 30) + Math.sin(angle) * dist * 0.6;
+    drawSparkle(sx, sy, 6, fadeEnvelope, elapsed / 100 + i);
+  }
+}
+
+function drawSparkle(x, y, size, alpha, rot) {
+  if (alpha <= 0) return;
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  ctx.translate(x, y);
+  ctx.rotate(rot);
+  ctx.fillStyle = '#f4c95d';
+  ctx.beginPath();
+  ctx.moveTo(0, -size);
+  ctx.lineTo(size * 0.3, -size * 0.3);
+  ctx.lineTo(size, 0);
+  ctx.lineTo(size * 0.3, size * 0.3);
+  ctx.lineTo(0, size);
+  ctx.lineTo(-size * 0.3, size * 0.3);
+  ctx.lineTo(-size, 0);
+  ctx.lineTo(-size * 0.3, -size * 0.3);
+  ctx.closePath();
+  ctx.fill();
+  ctx.restore();
+  ctx.globalAlpha = 1;
+}
+
+// Same squishy bounce-dance as the happy dance, but with hearts instead
+// of sparkles - played once right after healing sickness.
+function drawHealDance(t) {
+  const elapsed = HAPPY_DURATION_MS - (healUntil - t);
+  const p = elapsed / HAPPY_DURATION_MS;
+
+  const bounceOffset = -8 * Math.abs(Math.sin(elapsed / 150));
+  const wiggleDeg = 8 * Math.sin(elapsed / 120);
+  const squashY = 1 - 0.15 * Math.abs(Math.sin(elapsed / 150));
+
+  ctx.save();
+  ctx.translate(centerX, baseY + bounceOffset);
+  ctx.rotate(wiggleDeg * Math.PI / 180);
+  ctx.scale(1, squashY);
+  drawCreatureBody(0); // isSick is already false by now - back to its normal color
+  ctx.restore();
+
+  const heartCount = 6;
+  const fadeEnvelope = Math.sin(Math.min(1, p) * Math.PI);
+  for (let i = 0; i < heartCount; i++) {
+    const angle = (i / heartCount) * Math.PI * 2 + elapsed / 300;
+    const dist = 45 + 10 * Math.sin(elapsed / 200 + i);
+    const sx = centerX + Math.cos(angle) * dist;
+    const sy = (baseY - 30) + Math.sin(angle) * dist * 0.6;
+    drawHeart(sx, sy, 6, fadeEnvelope, elapsed / 100 + i);
+  }
+}
+
+function drawHeart(x, y, size, alpha, rot) {
+  if (alpha <= 0) return;
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  ctx.translate(x, y);
+  ctx.rotate(rot);
+  ctx.fillStyle = '#ff5c8a';
+  ctx.beginPath();
+  ctx.moveTo(0, size * 0.3);
+  ctx.bezierCurveTo(-size, -size * 0.5, -size * 0.5, -size * 1.2, 0, -size * 0.4);
+  ctx.bezierCurveTo(size * 0.5, -size * 1.2, size, -size * 0.5, 0, size * 0.3);
+  ctx.closePath();
+  ctx.fill();
+  ctx.restore();
+  ctx.globalAlpha = 1;
+}
+
+// Organic egg phase: a smooth implicit surface joins cells as they divide.
+const mitosis = {};
+bindSlider('mitosisInterval', 'mitosisIntervalVal', v => mitosis.mitosisInterval = v, v => v + 's');
+bindSlider('mitosisCount', 'mitosisCountVal', v => mitosis.mitosisCount = v, v => v + '');
+bindSlider('mitosisOutlineWidth', 'mitosisOutlineWidthVal', v => mitosis.mitosisOutlineWidth = v, v => v + 'pt');
+bindSlider('mitosisFillOpacity', 'mitosisFillOpacityVal', v => mitosis.mitosisFillOpacity = v, v => v + '%');
+bindSlider('mitosisOutlineOpacity', 'mitosisOutlineOpacityVal', v => mitosis.mitosisOutlineOpacity = v, v => v + '%');
+bindColor('mitosisFill', 'mitosisFillVal', v => mitosis.mitosisFill = v);
+bindColor('mitosisOutline', 'mitosisOutlineVal', v => mitosis.mitosisOutline = v);
+let mitosisCells = [], mitosisEpoch = null, mitosisLast = null, mitosisNext = 0;
+const cellLayer = document.createElement('canvas');
+cellLayer.width = W; cellLayer.height = H;
+const cellCtx = cellLayer.getContext('2d');
+const cellPixels = cellCtx.createImageData(W, H);
+function drawMitosis(t, epoch, settings = mitosis, speed = 1) {
+  if (mitosisEpoch !== epoch || !mitosisCells.length) {
+    mitosisEpoch = epoch; mitosisLast = t; mitosisNext = t + settings.mitosisInterval * 1000;
+    mitosisCells = [{x: W/2, y: H/2, vx: 6, vy: -4, r: 19 + Math.random()*8, seed: Math.random()*100}];
+  }
+  const dt = Math.min(.05, Math.max(0, (t-mitosisLast)/1000)) * speed;
+  mitosisLast = t;
+  mitosisCells.length = Math.min(mitosisCells.length, settings.mitosisCount);
+  // Interval changes take effect immediately without replaying missed splits.
+  mitosisNext = Math.min(mitosisNext, t + settings.mitosisInterval*1000);
+  if (t >= mitosisNext) {
+    // Snapshot this generation so newborn daughters wait until the next cycle.
+    const generation = mitosisCells.slice();
+    // Shuffle so a partial final generation does not always favor the first cell.
+    for (let i = generation.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [generation[i], generation[j]] = [generation[j], generation[i]];
+    }
+    for (const parent of generation) {
+      if (mitosisCells.length >= settings.mitosisCount) break;
+      const angle = Math.random()*Math.PI*2;
+      const dx = Math.cos(angle), dy = Math.sin(angle);
+      // Unequal daughters retain individual sizes instead of rerolling each frame.
+      const share = .3 + Math.random()*.4;
+      const area = parent.r * parent.r;
+      const daughterRadius = Math.max(8 + Math.random()*4, Math.sqrt(area*(1-share)));
+      parent.r = Math.max(8 + Math.random()*4, Math.sqrt(area*share));
+      mitosisCells.push({x:parent.x+dx*2, y:parent.y+dy*2, vx:dx*17, vy:dy*17, r:daughterRadius, seed:Math.random()*100});
+      parent.vx=-dx*17; parent.vy=-dy*17;
+    }
+    mitosisNext = t + settings.mitosisInterval*1000;
+  }
+  for (const c of mitosisCells) {
+    c.vx += Math.sin(t*.0007+c.seed)*dt*3;
+    c.vy += Math.cos(t*.0006+c.seed)*dt*3;
+    const speed = Math.hypot(c.vx,c.vy);
+    if(speed>18){c.vx*=18/speed;c.vy*=18/speed;}
+    c.x += c.vx*dt; c.y += c.vy*dt;
+    const margin = c.r+12;
+    if(c.x<margin){c.x=margin;c.vx=Math.abs(c.vx);}
+    if(c.x>W-margin){c.x=W-margin;c.vx=-Math.abs(c.vx);}
+    if(c.y<margin){c.y=margin;c.vy=Math.abs(c.vy);}
+    if(c.y>H-margin){c.y=H-margin;c.vy=-Math.abs(c.vy);}
+    c.rr = c.r*c.r*(1+.055*Math.sin(t*.002+c.seed));
+  }
+  renderCellField(mitosisCells, settings);
+}
+function renderCellField(cells, style) {
+  const rgb = hex => [1,3,5].map(i=>parseInt(hex.slice(i,i+2),16));
+  const fill=rgb(style.mitosisFill), stroke=rgb(style.mitosisOutline);
+  const halfWidth=style.mitosisOutlineWidth*4/3/2;
+  const data=cellPixels.data;
+  for(let y=0;y<H;y++) for(let x=0;x<W;x++) {
+    let field=0,gx=0,gy=0;
+    for(const c of cells){
+      const dx=x-c.x,dy=y-c.y,d=Math.max(.1,dx*dx+dy*dy);
+      field+=c.rr/d; const g=-2*c.rr/(d*d); gx+=g*dx;gy+=g*dy;
+    }
+    const distance=(field-1)/Math.max(.00001,Math.hypot(gx,gy));
+    const edge=halfWidth>0 ? Math.max(0,Math.min(1,halfWidth+.5-Math.abs(distance))) : 0;
+    const inside=Math.max(0,Math.min(1,distance+.5));
+    const sa=edge*style.mitosisOutlineOpacity/100;
+    const fa=inside*style.mitosisFillOpacity/100*(1-sa);
+    const alpha=sa+fa, i=(y*W+x)*4;
+    for(let k=0;k<3;k++) data[i+k]=alpha ? (stroke[k]*sa+fill[k]*fa)/alpha:0;
+    data[i+3]=alpha*255;
+  }
+  cellCtx.putImageData(cellPixels,0,0);
+  ctx.drawImage(cellLayer,0,0);
+}
+
+const lava = {};
+bindSlider('lavaInterval', 'lavaIntervalVal', v => lava.lavaInterval = v, v => v + 's');
+bindSlider('lavaCount', 'lavaCountVal', v => lava.lavaCount = v, v => v + '');
+bindSlider('lavaSpeed', 'lavaSpeedVal', v => lava.lavaSpeed = v, v => v + '×');
+bindSlider('lavaOutlineWidth', 'lavaOutlineWidthVal', v => lava.lavaOutlineWidth = v, v => v + 'pt');
+bindSlider('lavaFillOpacity', 'lavaFillOpacityVal', v => lava.lavaFillOpacity = v, v => v + '%');
+bindSlider('lavaOutlineOpacity', 'lavaOutlineOpacityVal', v => lava.lavaOutlineOpacity = v, v => v + '%');
+bindColor('lavaFill', 'lavaFillVal', v => lava.lavaFill = v);
+bindColor('lavaOutline', 'lavaOutlineVal', v => lava.lavaOutline = v);
+bindColor('lavaBackground', 'lavaBackgroundVal', v => lava.lavaBackground = v);
+let lavaEpoch = null;
+function enterLava() {
+  if(appState !== 'creature') return;
+  closeActionMenu(); statsScreenOpen=false; birthChartScreenOpen=false;
+  lavaEpoch = {}; // Unique session key resets the shared cell simulation.
+  appState='lava';
+  [pauseBtn,feedBtn,breatheBtn,cleanBtn,healBtn].forEach(btn=>btn.style.display='none');
+}
+function exitLava() {
+  exitDream();
+  actionMenuIndex=ACTION_MENU.findIndex(item=>item.action==='lava');
+}
+function stirLava() {
+  if (mitosisEpoch !== lavaEpoch) return;
+  for(const c of mitosisCells) {c.vx+=(Math.random()-.5)*18;c.vy-=8;}
+}
+function drawLava(t) {
+  ctx.fillStyle=lava.lavaBackground;ctx.fillRect(0,0,W,H);
+  drawMitosis(t, lavaEpoch, {
+    mitosisInterval:lava.lavaInterval, mitosisCount:lava.lavaCount,
+    mitosisFill:lava.lavaFill,mitosisOutline:lava.lavaOutline,
+    mitosisOutlineWidth:lava.lavaOutlineWidth,
+    mitosisFillOpacity:lava.lavaFillOpacity,mitosisOutlineOpacity:lava.lavaOutlineOpacity
+  }, lava.lavaSpeed);
+}
+
+let eggOutlineColor = '#2f2b26';
+let eggFillColor = '#f7f2e6';
+
+function drawPlaceholderEgg(w, h) {
+  const c = document.createElement('canvas');
+  c.width = w; c.height = h;
+  const cx = c.getContext('2d');
+  cx.fillStyle = eggFillColor;
+  cx.beginPath();
+  cx.ellipse(w/2, h/2, w/2 - 2, h/2 - 2, 0, 0, Math.PI*2);
+  cx.fill();
+  cx.strokeStyle = eggOutlineColor;
+  cx.lineWidth = 3;
+  cx.stroke();
+  cx.fillStyle = eggOutlineColor;
+  cx.beginPath(); cx.ellipse(w*0.4, h*0.35, w*0.16, h*0.12, 0.3, 0, Math.PI*2); cx.fill();
+  cx.beginPath(); cx.ellipse(w*0.65, h*0.55, w*0.14, h*0.1, -0.4, 0, Math.PI*2); cx.fill();
+  cx.beginPath(); cx.ellipse(w*0.35, h*0.72, w*0.12, h*0.09, 0.1, 0, Math.PI*2); cx.fill();
+  return c;
+}
+let placeholderNormal = drawPlaceholderEgg(eggBaseW, eggBaseH);
+let placeholderSquish = drawPlaceholderEgg(Math.round(eggBaseW*1.25), Math.round(eggBaseH*0.8));
+
+// Re-renders both placeholder egg canvases whenever the color pickers
+// change - they're pre-drawn once rather than redrawn every frame, so
+// a color change needs to explicitly regenerate them.
+function regeneratePlaceholders() {
+  placeholderNormal = drawPlaceholderEgg(eggBaseW, eggBaseH);
+  placeholderSquish = drawPlaceholderEgg(Math.round(eggBaseW*1.25), Math.round(eggBaseH*0.8));
+}
+
+bindColor('eggOutlineColor', 'eggOutlineColorVal', v => { eggOutlineColor = v; regeneratePlaceholders(); });
+bindColor('eggFillColor', 'eggFillColorVal', v => { eggFillColor = v; regeneratePlaceholders(); });
+
+let eggScreenBgColor = '#eee7d8';
+let creatureScreenBgColor = '#eee7d8';
+bindColor('eggScreenBgColor', 'eggScreenBgColorVal', v => eggScreenBgColor = v);
+bindColor('creatureScreenBgColor', 'creatureScreenBgColorVal', v => creatureScreenBgColor = v);
+
+canvas.addEventListener('click', (e) => {
+  if (appState === 'screensaver') {
+    exitScreensaver();
+    return;
+  }
+  if (appState === 'creature') {
+    lastInteractionAt = lastT; // any tap while active resets the idle clock
+  }
+
+
+
+  const rect = canvas.getBoundingClientRect();
+  const mx = (e.clientX - rect.left) * (W / rect.width);
+  const my = (e.clientY - rect.top) * (H / rect.height);
+  const dx = mx - centerX, dy = my - (baseY - eggBaseH/2);
+  if (Math.abs(dx) < eggBaseW*0.8 && Math.abs(dy) < eggBaseH*0.8) {
+    pokeEnergy = 1;
+  }
+});
+
+
+// --- Two-button device interaction ---
+const deviceButtonA = document.getElementById('deviceButtonA');
+const deviceButtonB = document.getElementById('deviceButtonB');
+
+function closeActionMenu() {
+  actionMenuOpen = false;
+  actionMenuIndex = 0;
+  actionMenuOpenedAt = 0;
+  lastInteractionAt = lastT;
+}
+
+function selectActionMenuItem() {
+  const selected = ACTION_MENU[actionMenuIndex];
+  if (!selected) return;
+
+  // Keep the menu usable even when an action is currently unavailable.
+  if (selected.action === 'clean' && poops.length === 0) return;
+  if (selected.action === 'heal' && !isSick) return;
+
+  if (selected.action === 'cancel') {
+    closeActionMenu();
+    return;
+  }
+
+  closeActionMenu();
+
+  if (selected.action === 'feed') {
+    feedBtn.click();
+  } else if (selected.action === 'breathe') {
+    breatheBtn.click();
+  } else if (selected.action === 'clean') {
+    cleanBtn.click();
+  } else if (selected.action === 'heal') {
+    healBtn.click();
+  } else if (selected.action === 'lava') {
+    enterLava();
+  } else if (selected.action === 'dream') {
+    enterDream();
+  } else if (selected.action === 'stats') {
+    statsScreenOpen = true;
+  } else if (selected.action === 'birthChart') {
+    birthChartScreenOpen = true;
+  }
+
+  }
+
+function handleButtonA() {
+  if (appState === 'lava') { stirLava(); return; }
+  if (appState === 'dream') { answerDream(); return; }
+  lastInteractionAt = lastT;
+
+  if (appState === 'screensaver') {
+    exitScreensaver();
+    return;
+  }
+
+  if (actionMenuOpen) {
+    selectActionMenuItem();
+    return;
+  }
+
+  if (statsScreenOpen || birthChartScreenOpen) {
+  statsScreenOpen = false;
+  birthChartScreenOpen = false;
+  actionMenuOpen = true;
+  actionMenuIndex = 0;
+  actionMenuOpenedAt = lastT;
+  return;
+}
+
+  if (appState === 'creature') {
+    actionMenuOpen = true;
+    actionMenuIndex = 0;
+    actionMenuOpenedAt = lastT;
+    return;
+  }
+
+  // Button A submits the creature name.
+  if (appState === 'naming') {
+    selectNameChoice();
+    return;
+  }
+
+  // Button A resurrects the creature from the death screen.
+  if (appState === 'dead') {
+    rebootBtn.click();
+    return;
+  }
+
+  // Preserve the existing boot / birth interaction using the physical A button.
+  if (appState === 'poweroff') {
+    appState = 'boot';
+    pauseBtn.textContent = 'Press Button';
+    return;
+  }
+
+  if (appState === 'boot') {
+    appState = 'falling';
+    fallStartTime = null;
+    pauseBtn.disabled = true;
+    pauseBtn.textContent = '...';
+    return;
+  }
+
+  if (appState === 'birthPrompt') {
+    beginNaming();
+    return;
+  }
+
+
+}
+
+function handleButtonB() {
+  if (appState === 'lava') { exitLava(); return; }
+  if (appState === 'naming') {
+    cycleNameSlot();
+    return;
+  }
+  if (appState === 'dream') { exitDream(); return; }
+  lastInteractionAt = lastT;
+
+  if (appState === 'screensaver') {
+    exitScreensaver();
+    return;
+  }
+
+  if (statsScreenOpen) {
+
+    statsScroll = (statsScroll + 1) % 4;
+
+return;
+
+}
+
+if (!actionMenuOpen) return;
+
+  actionMenuIndex = (actionMenuIndex + 1) % ACTION_MENU.length;
+  actionMenuOpenedAt = lastT;
+}
+
+// Short press A = select/action. Long press A = back.
+let buttonAPressTimer = null;
+let buttonALongPress = false;
+
+deviceButtonA.addEventListener('pointerdown', (e) => {
+  e.preventDefault();
+  deviceButtonA.setPointerCapture(e.pointerId);
+  buttonALongPress = false;
+  // Rhythm taps register on contact, not release. Suppress the matching release.
+  if (appState === 'dream') {
+    buttonALongPress = true;
+    answerDream();
+    return;
+  }
+  buttonAPressTimer = setTimeout(() => {
+    buttonALongPress = true;
+    if (appState === 'naming') {
+      nameConfirmOpen = true;
+      syncArcadeName();
+    } else if (appState === 'lava') exitLava();
+    else if (appState === 'dream') exitDream();
+    else if (actionMenuOpen) closeActionMenu();
+  }, 650);
+});
+
+deviceButtonA.addEventListener('pointerup', (e) => {
+  e.preventDefault();
+  if (buttonAPressTimer !== null) {
+    clearTimeout(buttonAPressTimer);
+    buttonAPressTimer = null;
+  }
+  if (!buttonALongPress) handleButtonA();
+});
+
+deviceButtonA.addEventListener('pointercancel', () => {
+  if (buttonAPressTimer !== null) {
+    clearTimeout(buttonAPressTimer);
+    buttonAPressTimer = null;
+  }
+});
+
+let buttonBPressTimer = null;
+let buttonBNamingPress = false;
+let buttonBLongPress = false;
+deviceButtonB.addEventListener('pointerdown', (e) => {
+  e.preventDefault();
+  if (buttonBPressTimer !== null) clearTimeout(buttonBPressTimer);
+  buttonBNamingPress = appState === 'naming';
+  buttonBLongPress = false;
+  if (!buttonBNamingPress) { handleButtonB(); return; }
+  deviceButtonB.setPointerCapture(e.pointerId);
+  buttonBPressTimer = setTimeout(() => {
+    buttonBPressTimer = null;
+    buttonBLongPress = true;
+    if (appState === 'naming') backNameSlot();
+  }, 650);
+});
+deviceButtonB.addEventListener('pointerup', (e) => {
+  e.preventDefault();
+  if (buttonBPressTimer !== null) clearTimeout(buttonBPressTimer);
+  buttonBPressTimer = null;
+  if (buttonBNamingPress && !buttonBLongPress && appState === 'naming') handleButtonB();
+  buttonBNamingPress = false;
+});
+deviceButtonB.addEventListener('pointercancel', () => {
+  if (buttonBPressTimer !== null) clearTimeout(buttonBPressTimer);
+  buttonBPressTimer = null;
+  buttonBNamingPress = false;
+});
+
+// --- Phase sequencer ---
+let phaseIndex = 0;
+let phaseStartTime = null;
+let lastT = 0;
+const phaseReadout = document.getElementById('phaseReadout');
+const pauseBtn = document.getElementById('pauseBtn');
+
+// --- Top-level app state, in front of the rock/bounce/roll loop ---
+// poweroff -> boot -> falling -> loop
+let appState = 'poweroff';
+
+// Two-button action menu.
+// Button A = Action / Select
+// Button B = Navigate down
+// Long-press A = Back / close menu
+let actionMenuOpen = false;
+let actionMenuIndex = 0;
+
+let hunger = 100;
+let happiness = 50;
+let energy = 100;
+let creatureAgeDays = 0;
+let statsScroll = 0;
+let statsScreenOpen = false;
+let birthChartScreenOpen = false;
+
+let actionMenuOpenedAt = 0;
+let ACTION_MENU_TIMEOUT_MS = 0;
+bindSlider('menuAutoClose', 'menuAutoCloseVal', v => {
+  ACTION_MENU_TIMEOUT_MS = v * 1000;
+  actionMenuOpenedAt = lastT;
+}, v => v === 0 ? 'Off' : v + ' s');
+const ACTION_MENU = [
+  { label: 'FEED', action: 'feed' },
+  { label: 'BREATHE', action: 'breathe' },
+  { label: 'DREAM', action: 'dream' },
+  { label: 'LAVA LAMP', action: 'lava' },
+  { label: 'CLEAN', action: 'clean' },
+  { label: 'HEAL', action: 'heal' },
+  { label: 'STATS', action: 'stats' },
+  { label: 'BIRTH CHART', action: 'birthChart' },
+  { label: 'CANCEL', action: 'cancel' }
+];
+
+let fallStartTime = null;
+let fallDurationMs = 4000;
+let eggFadeDurationMs = 800;
+// Hunger system
+let HUNGER_INTERVAL_MS = 10 * 1000;
+let HAPPINESS_INTERVAL_MS = 60000;
+let ENERGY_INTERVAL_MS = 60000;
+let lastHungerUpdate = null;
+let lastHappinessUpdate = null;
+let lastEnergyUpdate = null;
+let starvationStartedAt = null;
+let STARVATION_SICKNESS_MS = 2 * 60 * 1000; // 2 minutes
+const statRates = {};
+bindSlider('fullnessEvery', 'fullnessEveryVal', v => { HUNGER_INTERVAL_MS = v * 1000; lastHungerUpdate = null; }, v => v + ' s');
+bindSlider('fullnessLoss', 'fullnessLossVal', v => { statRates.fullnessLoss = v; }, v => v + ' pts');
+bindSlider('energyEvery', 'energyEveryVal', v => { ENERGY_INTERVAL_MS = v * 1000; lastEnergyUpdate = null; }, v => v + ' s');
+bindSlider('energyLoss', 'energyLossVal', v => { statRates.energyLoss = v; }, v => v + ' pts');
+bindSlider('happinessEvery', 'happinessEveryVal', v => { HAPPINESS_INTERVAL_MS = v * 1000; lastHappinessUpdate = null; }, v => v + ' s');
+bindSlider('happinessLoss', 'happinessLossVal', v => { statRates.happinessLoss = v; }, v => v + ' pts');
+bindSlider('feedFullness', 'feedFullnessVal', v => { statRates.feedFullness = v; }, v => v + ' pts');
+bindSlider('feedHappiness', 'feedHappinessVal', v => { statRates.feedHappiness = v; }, v => v + ' pts');
+bindSlider('breatheHappiness', 'breatheHappinessVal', v => { statRates.breatheHappiness = v; }, v => v + ' pts');
+bindSlider('healHappiness', 'healHappinessVal', v => { statRates.healHappiness = v; }, v => v + ' pts');
+bindSlider('poopHappinessLoss', 'poopHappinessLossVal', v => { statRates.poopHappinessLoss = v; }, v => v + ' pts');
+bindSlider('starvationDelay', 'starvationDelayVal', v => { STARVATION_SICKNESS_MS = v * 1000; }, v => v + ' s');
+bindSlider('feedDuration', 'feedDurationVal', v => { FEED_DURATION_MS = v * 1000; }, v => v + ' s');
+bindSlider('breathStep', 'breathStepVal', v => { BREATH_STEP_MS = v * 1000; }, v => v + ' s');
+bindSlider('happyDuration', 'happyDurationVal', v => { HAPPY_DURATION_MS = v * 1000; }, v => v + ' s');
+
+let cloudSpeedMult = 1, cloudSizeMult = 1, cloudSpreadMult = 1, cloudHeightOffset = 0;
+let promptBlinkMs = 500;
+
+function easeInQuad(t) { return t * t; }
+function smoothstep(t) { return t * t * (3 - 2 * t); }
+
+function lerpColor(hex1, hex2, t) {
+  const c1 = parseInt(hex1.slice(1), 16), c2 = parseInt(hex2.slice(1), 16);
+  const r1 = (c1 >> 16) & 255, g1 = (c1 >> 8) & 255, b1 = c1 & 255;
+  const r2 = (c2 >> 16) & 255, g2 = (c2 >> 8) & 255, b2 = c2 & 255;
+  const r = Math.round(r1 + (r2 - r1) * t);
+  const g = Math.round(g1 + (g2 - g1) * t);
+  const b = Math.round(b1 + (b2 - b1) * t);
+  return `rgb(${r},${g},${b})`;
+}
+
+bindSlider('fallDuration', 'fallDurationVal', v => fallDurationMs = v, v => (v/1000).toFixed(1) + 's');
+bindSlider('eggFadeDuration', 'eggFadeDurationVal', v => eggFadeDurationMs = v, v => (v/1000).toFixed(1) + 's');
+
+bindSlider('cloudSpeed', 'cloudSpeedVal', v => cloudSpeedMult = v / 100, v => (v/100).toFixed(1) + 'x');
+bindSlider('cloudSize', 'cloudSizeVal', v => cloudSizeMult = v / 100, v => (v/100).toFixed(1) + 'x');
+bindSlider('cloudSpread', 'cloudSpreadVal', v => cloudSpreadMult = v / 100, v => (v/100).toFixed(1) + 'x');
+bindSlider('cloudHeight', 'cloudHeightVal', v => cloudHeightOffset = v, v => v + 'px');
+bindSlider('promptBlink', 'promptBlinkVal', v => promptBlinkMs = v, v => v + 'ms');
+
+pauseBtn.addEventListener('click', () => {
+  if (appState === 'poweroff') {
+    appState = 'boot';
+    pauseBtn.textContent = 'Press Button';
+    return;
+  }
+  if (appState === 'boot') {
+    appState = 'falling';
+    fallStartTime = null; // set on the next frame
+    pauseBtn.disabled = true;
+    pauseBtn.textContent = '...';
+    return;
+  }
+  if (appState === 'falling') {
+    return; // ignore clicks mid-fall
+  }
+  if (appState === 'birthPrompt') {
+    beginNaming();
+    return;
+  }
+  if (appState === 'naming') {
+    return; // ignore canvas-button clicks while naming - use the confirm button/Enter key
+  }
+  if (appState === 'hatching') {
+    return; // ignore clicks mid-hatch
+  }
+  // appState === 'loop' or 'creature': the button is hidden in both, so
+  // there's nothing left to handle here.
+});
+
+const rebootBtn = document.getElementById('rebootBtn');
+const cleanBtn = document.getElementById('cleanBtn');
+const breatheBtn = document.getElementById('breatheBtn');
+const feedBtn = document.getElementById('feedBtn');
+const healBtn = document.getElementById('healBtn');
+const wakeBtn = document.getElementById('wakeBtn');
+const creatureNameInput = document.getElementById('creatureNameInput');
+const confirmNameBtn = document.getElementById('confirmNameBtn');
+
+wakeBtn.addEventListener('click', exitScreensaver);
+
+function confirmCreatureName() {
+  if (appState !== 'naming') return;
+  const typed = creatureNameInput.value.trim();
+  if (!typed) return;
+  creatureName = typed.slice(0, NAME_LIMIT);
+  creatureNameInput.style.display = 'none';
+  confirmNameBtn.style.display = 'none';
+  appState = 'hatching';
+  hatchStartTime = null; // set on the next frame
+  pauseBtn.disabled = true;
+  pauseBtn.style.display = 'inline-block';
+  pauseBtn.textContent = '...';
+}
+
+confirmNameBtn.addEventListener('click', confirmCreatureName);
+creatureNameInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') confirmCreatureName();
+});
+
+// Jumps straight into any screen, fully initialized - sets up whatever
+// timers/state that screen expects and shows/hides the right buttons,
+// the same way the normal transitions do, instead of just flipping
+// appState and leaving things half set up.
+function jumpTo(target) {
+  const t = lastT;
+  actionMenuOpen = false;
+  actionMenuIndex = 0;
+
+  // Start from a clean slate every time, then layer on only what the
+  // target screen actually needs - avoids leftover state from whatever
+  // screen was active before (e.g. a poop pile carrying over into boot).
+  phaseIndex = 0; phaseStartTime = null;
+  fallStartTime = null; loopEnterTime = null; hatchStartTime = null;
+  creatureEnterTime = null; nextBlinkAt = null; blinkStartAt = null;
+  birthPromptOverlayDrawn = false; namingOverlayDrawn = false; poops = []; nextPoopSpawnAt = null;
+  creatureNameInput.style.display = 'none'; confirmNameBtn.style.display = 'none';
+  happyUntil = null; isSick = false; sickStartedAt = null; starvationStartedAt = null; healUntil = null;
+  breathingStartTime = null; feedingStartTime = null;
+  healBtn.style.display = 'none'; healBtn.disabled = false;
+  cleanBtn.style.display = 'none';
+  breatheBtn.style.display = 'none'; breatheBtn.disabled = false;
+  feedBtn.style.display = 'none'; feedBtn.disabled = false;
+  screensaverActive = false; lastInteractionAt = null; wakeBtn.style.display = 'none';
+  pauseBtn.disabled = false;
+
+  switch (target) {
+    case 'poweroff':
+      appState = 'poweroff';
+      pauseBtn.style.display = 'inline-block';
+      pauseBtn.textContent = 'Power On';
+      break;
+
+    case 'boot':
+      appState = 'boot';
+      pauseBtn.style.display = 'inline-block';
+      pauseBtn.textContent = 'Press Button';
+      break;
+
+    case 'falling':
+      appState = 'falling';
+      pauseBtn.disabled = true;
+      pauseBtn.style.display = 'inline-block';
+      pauseBtn.textContent = '...';
+      break;
+
+    case 'loop':
+      appState = 'loop';
+      phaseStartTime = t;
+      loopEnterTime = t;
+      pauseBtn.style.display = 'none';
+      break;
+
+    case 'birthPrompt':
+      appState = 'birthPrompt';
+      pauseBtn.style.display = 'inline-block';
+      pauseBtn.textContent = 'Press Button';
+      break;
+
+    case 'hatching':
+      appState = 'hatching';
+      pauseBtn.disabled = true;
+      pauseBtn.style.display = 'inline-block';
+      pauseBtn.textContent = '...';
+      break;
+
+    case 'creature':
+      appState = 'creature';
+      creatureEnterTime = t;
+      creatureBornAt = Date.now();
+    lastFedAt = Date.now();
+      nextBlinkAt = t + 2000 + Math.random() * 2500;
+      nextPoopSpawnAt = Date.now() + poopAfterMs;
+      phaseStartTime = t;
+      pauseBtn.style.display = 'none';
+      breatheBtn.style.display = 'inline-block';
+      feedBtn.style.display = 'inline-block';
+      saveCreatureState();
+      break;
+
+
+    case 'sick':
+      appState = 'creature';
+      creatureEnterTime = t;
+      creatureBornAt = Date.now();
+    lastFedAt = Date.now();
+      nextBlinkAt = t + 2000 + Math.random() * 2500;
+      phaseStartTime = t;
+      poops = Array.from({ length: sickThreshold }, () => randomPoopPosition());
+      nextPoopSpawnAt = null; // already past the cap, so no new spawns until healed
+      isSick = true;
+      happiness = 0;
+      sickStartedAt = Date.now();
+      pauseBtn.style.display = 'none';
+      breatheBtn.style.display = 'inline-block';
+      feedBtn.style.display = 'inline-block';
+      cleanBtn.style.display = 'inline-block';
+      healBtn.style.display = 'inline-block';
+      saveCreatureState();
+      break;
+
+    case 'dead':
+      appState = 'dead';
+      creatureBornAt = Date.now();
+    lastFedAt = Date.now();
+      isSick = true;
+      sickStartedAt = Date.now() - deathAfterMs; // already past the death threshold
+      poops = Array.from({ length: sickThreshold }, () => randomPoopPosition());
+      nextPoopSpawnAt = null;
+      pauseBtn.style.display = 'none';
+      saveCreatureState();
+      break;
+
+    case 'breathing':
+      appState = 'breathing';
+      breathingStartTime = t;
+      pauseBtn.style.display = 'none';
+      breatheBtn.style.display = 'inline-block';
+      breatheBtn.disabled = true;
+      feedBtn.style.display = 'inline-block';
+      break;
+
+    case 'feeding':
+      appState = 'feeding';
+      feedingStartTime = t;
+      pauseBtn.style.display = 'none';
+      breatheBtn.style.display = 'inline-block';
+      feedBtn.style.display = 'inline-block';
+      feedBtn.disabled = true;
+      break;
+  }
+}
+
+document.querySelectorAll('[data-jump]').forEach(btn => {
+  btn.addEventListener('click', () => jumpTo(btn.dataset.jump));
+});
+
+document.getElementById('resetSettingsBtn').addEventListener('click', () => {
+  try { localStorage.removeItem(SETTINGS_KEY); } catch (e) {}
+  location.reload();
+});
+
+rebootBtn.addEventListener('click', () => {
+  appState = 'boot';
+  actionMenuOpen = false;
+  actionMenuIndex = 0;
+  phaseIndex = 0;
+  phaseStartTime = null;
+  fallStartTime = null;
+  loopEnterTime = null;
+  hatchStartTime = null;
+  creatureEnterTime = null;
+  nextBlinkAt = null;
+  blinkStartAt = null;
+  birthPromptOverlayDrawn = false;
+  namingOverlayDrawn = false;
+  creatureName = '';
+  creatureNameInput.style.display = 'none';
+  confirmNameBtn.style.display = 'none';
+  poops = [];
+  nextPoopSpawnAt = null;
+  creatureBornAt = null;
+  clearCreatureSave();
+  happyUntil = null;
+  isSick = false;
+  sickStartedAt = null;
+  healUntil = null;
+  healBtn.style.display = 'none';
+  cleanBtn.style.display = 'none';
+  breathingStartTime = null;
+  breatheBtn.style.display = 'none';
+  breatheBtn.disabled = false;
+  feedingStartTime = null;
+  feedBtn.style.display = 'none';
+  feedBtn.disabled = false;
+  screensaverActive = false; lastInteractionAt = null; wakeBtn.style.display = 'none';
+  pauseBtn.disabled = false;
+  pauseBtn.style.display = 'inline-block';
+  pauseBtn.textContent = 'Press Button';
+});
+
+cleanBtn.addEventListener('click', () => {
+  if (poops.length === 0) return;
+  lastInteractionAt = lastT;
+  poops = [];
+  cleanBtn.style.display = 'none';
+  happyUntil = lastT + HAPPY_DURATION_MS;
+  saveCreatureState();
+});
+
+breatheBtn.addEventListener('click', () => {
+
+if (appState !== 'creature') return;
+
+lastInteractionAt = lastT;
+
+happiness = Math.min(100, happiness + statRates.breatheHappiness);
+
+appState = 'breathing';
+
+breathingStartTime = lastT;
+
+breatheBtn.disabled = true;
+
+});
+
+feedBtn.addEventListener('click', () => {
+
+if (appState !== 'creature') return;
+
+lastInteractionAt = lastT;
+
+hunger = Math.min(100, hunger + statRates.feedFullness);
+
+happiness = Math.min(100, happiness + statRates.feedHappiness);
+
+appState = 'feeding';
+
+feedingStartTime = lastT;
+
+feedBtn.disabled = true;
+
+});
+
+healBtn.addEventListener('click', () => {
+  if (!isSick) return;
+  lastInteractionAt = lastT;
+  happiness = Math.min(100, happiness + statRates.healHappiness);
+  isSick = false;
+
+sickStartedAt = null;
+
+starvationStartedAt = null;
+
+poops = []; // healing also clears the pile, so sickness doesn't instantly re-trigger
+  cleanBtn.style.display = 'none';
+  healBtn.style.display = 'none';
+  nextPoopSpawnAt = Date.now() + poopAfterMs;
+  healUntil = lastT + HAPPY_DURATION_MS;
+  saveCreatureState();
+});
+
+
+
+const phaseLabels = { rock: 'Rocking', idle: 'Idle', bounce: 'Bouncing' };
+
+function currentPhases() {
+  return [
+    { type: 'rock', duration: tiltPeriodMs * rockRepeats, repeats: rockRepeats },
+    { type: 'idle', duration: idleDurationMs },
+    { type: 'bounce', duration: bouncePeriodMs * bounceRepeats, repeats: bounceRepeats },
+    { type: 'idle', duration: idleDurationMs },
+    { type: 'roll', duration: rollDurationMs },
+    { type: 'idle', duration: idleDurationMs },
+  ];
+}
+
+// Same rock/bounce timing as the egg, minus the roll - the creature stays
+// put once it's born rather than rolling off-screen.
+function creaturePhases() {
+  return [
+    { type: 'rock', duration: tiltPeriodMs * rockRepeats, repeats: rockRepeats },
+    { type: 'idle', duration: idleDurationMs },
+    { type: 'bounce', duration: bouncePeriodMs * bounceRepeats, repeats: bounceRepeats },
+    { type: 'idle', duration: idleDurationMs },
+  ];
+}
+
+// While sick, the creature just sits still - no rocking or bouncing,
+// only the idle pose (still breathing, still blinking).
+function sickCreaturePhases() {
+  return [
+    { type: 'idle', duration: idleDurationMs },
+  ];
+}
+
+function easeInCubic(t) { return t * t * t; }
+function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
+// ================================
+// HUNGER UPDATE
+// ================================
+function updateHunger(t) {
+  // Only a living creature accumulates stat decay; menus and DREAM still count.
+  if (!['creature', 'dream', 'lava', 'breathing', 'feeding', 'screensaver'].includes(appState)) {
+    lastHungerUpdate = lastHappinessUpdate = lastEnergyUpdate = null;
+    return;
+  }
+  function decay(value, previous, interval, loss) {
+    if (previous === null) return [value, t];
+    const ticks = Math.max(0, Math.floor((t - previous) / interval));
+    return [Math.max(0, value - ticks * loss), previous + ticks * interval];
+  }
+  [hunger, lastHungerUpdate] = decay(hunger, lastHungerUpdate, HUNGER_INTERVAL_MS, statRates.fullnessLoss);
+  [happiness, lastHappinessUpdate] = decay(happiness, lastHappinessUpdate, HAPPINESS_INTERVAL_MS, statRates.happinessLoss);
+  [energy, lastEnergyUpdate] = decay(energy, lastEnergyUpdate, ENERGY_INTERVAL_MS, statRates.energyLoss);
+  if (hunger <= 0 && !isSick) {
+    if (starvationStartedAt === null) starvationStartedAt = Date.now();
+    if (Date.now() - starvationStartedAt >= STARVATION_SICKNESS_MS) {
+      isSick = true;
+      sickStartedAt = Date.now();
+      if (appState === 'creature') healBtn.style.display = 'inline-block';
+      phaseIndex = 0;
+      phaseStartTime = t;
+      saveCreatureState();
+    }
+  } else if (hunger > 0) {
+    starvationStartedAt = null;
+  }
+}
+
+function drawFrame(t) {
+  lastT = t;
+  updateHunger(t);
+  if (appState === 'poweroff') {
+    ctx.fillStyle = '#111';
+    ctx.fillRect(0, 0, W, H);
+    requestAnimationFrame(drawFrame);
+    return;
+  }
+
+  if (appState === 'boot') {
+    drawBootScreen(t);
+    requestAnimationFrame(drawFrame);
+    return;
+  }
+
+  if (appState === 'falling') {
+    drawFallingScreen(t);
+    requestAnimationFrame(drawFrame);
+    return;
+  }
+
+  if (appState === 'birthPrompt') {
+    if (!birthPromptOverlayDrawn) {
+      drawBirthPromptOverlay();
+      birthPromptOverlayDrawn = true;
+    }
+    requestAnimationFrame(drawFrame);
+    return; // leaves the fully-cracked egg frozen underneath, overlay drawn once
+  }
+
+  if (appState === 'naming') {
+    if (!namingOverlayDrawn) {
+      drawNamingOverlay();
+      namingOverlayDrawn = true;
+    }
+    requestAnimationFrame(drawFrame);
+    return; // frozen egg underneath, waiting on the real text input below the canvas
+  }
+
+  if (appState === 'hatching') {
+    drawHatchingScreen(t);
+    requestAnimationFrame(drawFrame);
+    return;
+  }
+
+  if (appState === 'creature') {
+
+    if (statsScreenOpen) {
+
+drawStatsScreen(t);
+
+} else if (birthChartScreenOpen) {
+
+drawBirthChartScreen();
+
+} else {
+
+drawCreatureScreen(t);
+
+}
+
+requestAnimationFrame(drawFrame);
+
+return;
+
+}
+
+  if (appState === 'screensaver') {
+    drawScreensaverScreen(t);
+    requestAnimationFrame(drawFrame);
+    return;
+  }
+
+  if (appState === 'breathing') {
+    drawBreathingScreen(t);
+    requestAnimationFrame(drawFrame);
+    return;
+  }
+
+  if (appState === 'lava') {
+    drawLava(t);
+    requestAnimationFrame(drawFrame);
+    return;
+  }
+
+  if (appState === 'dream') {
+    drawDreamScreen(t);
+    requestAnimationFrame(drawFrame);
+    return;
+  }
+
+  if (appState === 'feeding') {
+    drawFeedingScreen(t);
+    requestAnimationFrame(drawFrame);
+    return;
+  }
+
+
+
+  if (appState === 'dead') {
+    drawDeadScreen(t);
+    requestAnimationFrame(drawFrame);
+    return;
+  }
+
+  ctx.fillStyle = eggScreenBgColor;
+  ctx.fillRect(0, 0, W, H);
+
+  const loopElapsed = (loopEnterTime !== null) ? (t - loopEnterTime) : 0;
+  let crackSeverity = 0;
+  if (loopElapsed > crackAfterMs) {
+    crackSeverity = Math.min(1, (loopElapsed - crackAfterMs) / crackBuildMs);
+  }
+
+  if (loopElapsed >= birthPromptAfterMs) {
+    appState = 'birthPrompt';
+    birthPromptOverlayDrawn = false;
+    pauseBtn.disabled = false;
+    pauseBtn.style.display = 'inline-block';
+    pauseBtn.textContent = 'Press Button';
+  }
+
+  drawMitosis(t, loopEnterTime);
+  requestAnimationFrame(drawFrame);
+}
+
+updateCodeBox();
+
+// Restoring a saved creature (if one exists) skips straight past the
+// power-on/boot/hatch sequence entirely - you come back to find it
+// exactly where real time says it should be.
+restoreCreatureIfSaved();
+
+// Safety-net autosaves: these fire reliably even when a tab is about to
+// be backgrounded or closed, which beforeunload does not on mobile.
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) saveCreatureState();
+});
+window.addEventListener('pagehide', saveCreatureState);
+
+requestAnimationFrame(drawFrame);
+</script>
+
+
+
+</body></html>
